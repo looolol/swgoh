@@ -1,0 +1,38 @@
+.login-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  padding: 20px;
+}
+
+mat-form-field {
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+button[type="submit"] {
+  width: 100%;
+}
+
+mat-card-title {
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+mat-card-content {
+  display: flex;
+  flex-direction: column;
+}
+
+@media (max-width: 600px) {
+  .login-card {
+    max-width: 90%;
+  }
+}

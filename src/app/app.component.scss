@@ -1,0 +1,17 @@
+.mat-toolbar {
+    display: flex;
+    justify-content: space-between;
+  }
+  
+  .logo {
+    margin-right: 16px;
+  }
+  
+  .spacer {
+    flex: 1 1 auto;
+  }
+  
+  .nav-links {
+    display: flex;
+    align-items: center;
+  }

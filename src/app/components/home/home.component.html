@@ -1,0 +1,21 @@
+<div class="home-container">
+
+  <mat-toolbar color="primary" class="banner">
+    <div class="banner-content">
+      <h1 class="mat-display-1">Welcome to SWGOH Companion</h1>
+      <p class="mat-h2">Your ultimate tool for Star Wars: Galaxy of Heroes strategy and insights.</p>
+    </div>
+  </mat-toolbar>
+
+  <div class="content-container" *ngIf="!isLoggedIn">
+    <app-login-form (login)="handleLogin($event)"></app-login-form>
+  </div>
+  
+  <div class="content-container" *ngIf="isLoggedIn">
+    <app-dashboard 
+      [currentUser]="currentUser" 
+      (logout)="handleLogout()"
+      [progressData]="progressData">
+    </app-dashboard>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<div class="home-container">
+  <h1 class="welcome-header">Welcome to SWGOH</h1>
+  
+  <div class="content-container">
+    <ng-container *ngIf="!loggedIn; else dashboard">
+      <mat-card appearance="outlined">
+        <mat-card-header>
+          <mat-card-title>Get Started</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Enter your Ally Code:</p>
+          <form (ngSubmit)="onSubmit()">
+            <mat-form-field appearance="outline">
+              <mat-label>Ally Code</mat-label>
+              <input matInput [(ngModel)]="allyCode" name="allyCode" required>
+              <mat-hint>Enter 9 digits, with or without dashes</mat-hint>
+            </mat-form-field>
+            <button mat-raised-button color="primary" type="submit">Submit</button>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </ng-container>
+    
+    <ng-template #dashboard>
+      <mat-card appearance="outlined" class="dashboard-card">
+        <mat-card-header>
+          <mat-card-title>Dashboard</mat-card-title>
+          <mat-card-subtitle>Ally Code: {{ allyCode }}</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+
+          <div class="button-grid">
+            <button mat-raised-button color="primary" routerLink="/team-planner">Team Planner</button>
+            <button mat-raised-button color="primary" routerLink="/farming-plans">Farming Plans</button>
+            <button mat-raised-button color="primary" routerLink="/character-farming">Character Farming</button>
+            <button mat-raised-button color="primary" routerLink="/ships">Ships</button>
+            <button mat-raised-button color="primary" routerLink="/conquest-planner">Conquest Planner</button>
+            <button mat-raised-button color="accent" (click)="clearAllyCode()">Clear Ally Code</button>
+          </div>
+
+          <div class="progress-section">
+            <div class="progress-item">
+              <h3>Galactic Power</h3>
+              <mat-progress-bar mode="determinate" value="75"></mat-progress-bar>
+              <p>3,750,000 / 5,000,000</p>
+            </div>
+            <div class="progress-item">
+              <h3>Characters Unlocked</h3>
+              <mat-progress-bar mode="determinate" value="60"></mat-progress-bar>
+              <p>120 / 200</p>
+            </div>
+          </div>
+
+        </mat-card-content>
+      </mat-card>
+    </ng-template>
+  </div>
+</div>

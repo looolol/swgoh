@@ -1,0 +1,32 @@
+<mat-card class="dashboard-container">
+  <mat-card-header>
+    <mat-card-title>
+      Welcome, {{ currentUser?.userName }}!
+    </mat-card-title>
+    <mat-card-subtitle>
+      Your Ally Code: {{ currentUser?.allyCode }}
+    </mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+
+    <h2>Quick Actions</h2>
+    <div class="action-buttons">
+      <button mat-raised-button color="primary" routerLink="/team-planner">Team Planner</button>
+      <button mat-raised-button color="primary" routerLink="/farming-plans">Farming Plans</button>
+      <button mat-raised-button color="primary" routerLink="/conquest-planner">Conquest Planner</button>
+    </div>
+
+    <h2>Progress Summary</h2>
+
+
+    <app-progress-summary
+      [progressData]="progressData">
+    </app-progress-summary>
+
+  </mat-card-content>
+
+  <mat-card-actions align="end">
+    <button mat-button color="warn" (click)="handleLogout()">Logout</button>
+  </mat-card-actions>
+</mat-card>

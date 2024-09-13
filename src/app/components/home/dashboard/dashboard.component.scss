@@ -1,0 +1,18 @@
+.dashboard-container {
+    max-width: 800px;
+    margin: 20px auto;
+  }
+  
+  .action-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+mat-card-header {
+  margin-bottom: 20px;
+}
+
+mat-card-content {
+  padding-top: 20px;
+}
