@@ -1,0 +1,7 @@
+<div *ngIf="unit && character" class="character-container">
+    <div class="character-frame">
+      <img [src]="character.image" [alt]="character.name" class="character-image">
+      <img [src]="gearFrameUrl" alt="Gear Frame" class="gear-frame">
+    </div>
+    <p class="character-name">{{character.name}}</p>
+</div>

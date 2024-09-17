@@ -1,0 +1,7 @@
+.team-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px; // Slightly reduced from 20px if needed
+    padding: 20px;
+  }

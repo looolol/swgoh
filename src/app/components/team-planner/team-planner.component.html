@@ -1,4 +1,5 @@
-<p>team-planner works!</p>
-
-<div>
+<div class="team-container">
+    <div *ngFor="let unit of units">
+        <app-character [unit]="unit" [characters]="gameDataStore.characters"></app-character>
+    </div>
 </div>
