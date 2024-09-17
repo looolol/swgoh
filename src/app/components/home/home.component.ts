@@ -40,7 +40,8 @@ export class HomeComponent implements OnInit {
 
   async handleLogin(allyCode: string): Promise<void> {
     try {
-      await this.authService.login(allyCode);
+      this.user = await this.authService.login(allyCode);
+      this.isLoggedIn = true;
     } catch (error) {
       console.error('Failed to login', error);
     }
