@@ -1,14 +1,10 @@
 import { Injectable } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
+import { DEFAULT_USER, DEFAULT_USER_DATA, User } from '../../models/user.model';
 
 interface LoginMethod {
   login(creds: any): Promise<User>;
   logout(): Promise<void>;  
-}
-
-export type User = {
-  allyCode: string;
-  userName: string;
 }
 
 class AllyCodeLogin implements LoginMethod {
@@ -18,7 +14,7 @@ class AllyCodeLogin implements LoginMethod {
     if (allyCode?.length === 9 && /^\d+$/.test(allyCode)) {
       const user: User = {
         allyCode: allyCode,
-        userName: 'looolol',
+        userName: `Player${allyCode}`, // Generate a default username
       };
       await this.storageService.setItem('user', JSON.stringify(user));
       return user;
@@ -42,11 +38,14 @@ export class AuthService {
   }
 
   async login(allyCode: string): Promise<User> {
-    return this.loginMethod.login(allyCode);
+    const user = await this.loginMethod.login(allyCode);
+    // Emit an event or update an observable to notify components of login
+    return user;
   }
 
   async logout(): Promise<void> {
-    return this.loginMethod.logout();
+    await this.loginMethod.logout();
+    // Emit an event or update an observable to notify components of logout
   }
 
   async isLoggedIn(): Promise<boolean> {
@@ -54,8 +53,8 @@ export class AuthService {
     return userStr !== null;
   }
 
-  async getCurrentUser(): Promise<User | null> {
+  async getCurrentUser(): Promise<User> {
     const userStr = await this.storageService.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
+    return userStr ? JSON.parse(userStr) : DEFAULT_USER;
   }
 }

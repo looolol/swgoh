@@ -10,17 +10,49 @@ export class SwgohApiService {
 
   constructor(private http: HttpClient) { }
 
-  getUnits(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/units/`);
+
+  getPlayerProfile(allyCode: string): Observable<any> {
+    return this.http.get(`${this.baseUrl}/player/${allyCode}/`);
   }
 
-  getCharacters(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/characters/`);
-  }
 
-  getShips(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/ships/`);
-  }
+  // getUnits(): Observable<any> {
+  //   return this.http.get(`${this.baseUrl}/units/`);
+  // }
 
-  // Add more methods for other API endpoints as needed
+  // getCharacters(): Observable<any> {
+  //   return this.http.get(`${this.baseUrl}/characters/`);
+  // }
+
+  // getShips(): Observable<any> {
+  //   return this.http.get(`${this.baseUrl}/ships/`);
+  // }
+
+  // getGear(): Observable<any> {
+  //   return this.http.get(`${this.baseUrl}/gear/`);
+  // }
+
+  // getAbilities(): Observable<any> {
+  //   return this.http.get(`${this.baseUrl}/abilities/`);
+  // }
+
+  // getStatDefinitions(): Observable<any> {
+  //   return this.http.get(`${this.baseUrl}/stat-definitions/`);
+  // }
+
+  // getDatacronAffixTemplateSets(): Observable<any> {
+  //   return this.http.get(`${this.baseUrl}/datacron-affix-template-sets/`);
+  // }
+
+  // getDatacronSets(): Observable<any> {
+  //   return this.http.get(`${this.baseUrl}/datacron-sets/`);
+  // }
+
+  // getDatacronTemplates(): Observable<any> {
+  //   return this.http.get(`${this.baseUrl}/datacron-templates/`);
+  // }
+
+  // getGuildProfile(guildId: string): Observable<any> {
+  //   return this.http.get(`${this.baseUrl}/guild-profile/${guildId}/`);
+  // }
 }

@@ -1,9 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService, User } from '../../services/auth/auth.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { LoginFormComponent } from './login-form/login-form.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { User, DEFAULT_USER } from '../../models/user.model';
+
 
 @Component({
   selector: 'app-home',
@@ -19,7 +21,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 })
 export class HomeComponent implements OnInit {
   isLoggedIn = false;
-  currentUser: User | null = null;
+  currentUser: User = DEFAULT_USER;
 
   progressData: any;
  
@@ -27,13 +29,17 @@ export class HomeComponent implements OnInit {
 
   async ngOnInit(): Promise<void> {
     await this.checkLoginStatus();
-    await this.isLoggedIn ? this.getProgressData() : null;
+    if (this.isLoggedIn) {
+      await this.getProgressData();
+    }
   }
 
   async checkLoginStatus(): Promise<void> {
     this.isLoggedIn = await this.authService.isLoggedIn();
     if (this.isLoggedIn) {
       this.currentUser = await this.authService.getCurrentUser();
+    } else {
+      this.currentUser = DEFAULT_USER;
     }
   }
 
@@ -41,20 +47,27 @@ export class HomeComponent implements OnInit {
     try {
       await this.authService.login(allyCode);
       await this.checkLoginStatus();
+      if (this.isLoggedIn) {
+        await this.getProgressData();
+      }
     } catch (error) {
       console.error('Failed to login', error);
     }
   }
 
   async handleLogout(): Promise<void> {
-    await this.authService.logout();
-    this.isLoggedIn = false;
-    this.currentUser = null;
+    try {
+      await this.authService.logout();
+      this.isLoggedIn = false;
+      this.currentUser = DEFAULT_USER;
+      this.progressData = null;
+    } catch (error) {
+      console.error('Failed to logout', error);
+    }
   }
 
   async getProgressData(): Promise<void> {
     this.progressData = await this.getMockProgressData();
-    console.log(this.progressData);
   }
 
   async getMockProgressData(): Promise<any> {
