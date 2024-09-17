@@ -1,5 +1,17 @@
-<div class="team-container">
-    <div *ngFor="let unit of units">
-        <app-character [unit]="unit" [characters]="gameDataStore.characters"></app-character>
-    </div>
+<div class="team-planner-container">
+  <mat-card class="character-list">
+    <mat-card-header>
+      <mat-card-title>All Characters</mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <cdk-virtual-scroll-viewport itemSize="{{itemSize}}" class="character-scroll">
+        <div class="character-grid">
+          <div *ngFor="let unit of unassignedTeam.units;" class="character-item">
+            <app-character [unit]="unit" [characters]="gameDataStore.characters"></app-character>
+          </div>
+        </div>
+      </cdk-virtual-scroll-viewport>
+    </mat-card-content>
+  </mat-card>
 </div>
