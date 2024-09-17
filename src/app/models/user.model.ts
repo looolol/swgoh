@@ -11,43 +11,43 @@ export type User = {
     ship_battles_won: number;
     pvp_battles_won: number;
     pve_battles_won: number;
-    galactic_war_won: number,
-    guild_raid_won: number,
-    guild_contribution: number,
-    guild_exchange_donations: number,
-    season_full_clears: number,
-    season_successful_defends: number,
-    season_league_score: number,
-    season_undersized_squad_wins: number,
-    season_promotions_earned: number,
-    season_banners_earned: number,
-    season_offensive_battles_won: number,
-    season_territories_defeated: number,
-    url: string,
+    galactic_war_won: number;
+    guild_raid_won: number;
+    guild_contribution: number;
+    guild_exchange_donations: number;
+    season_full_clears: number;
+    season_successful_defends: number;
+    season_league_score: number;
+    season_undersized_squad_wins: number;
+    season_promotions_earned: number;
+    season_banners_earned: number;
+    season_offensive_battles_won: number;
+    season_territories_defeated: number;
+    url: string;
     arena: {
-        rank: number,
-        leader: string,
-        members: string[],
-    },
+        rank: number;
+        leader: string;
+        members: string[];
+    };
     fleet_arena: {
-        rank: number,
-        leader: string,
-        members: string[],
-        reinforcements: string[]
-    },
-    skill_rating: number,
-    league_name: string,
-    league_frame_image: string,
-    league_blank_image: string,
-    league_image: string,
-    division_number: number,
-    division_image: string,
-    portrait_image: string,
-    title: string,
-    guild_id: string,
-    guild_name: string,
-    guild_url: string,
-    mods: any[]
+        rank: number;
+        leader: string;
+        members: string[];
+        reinforcements: string[];
+    };
+    skill_rating: number;
+    league_name: string;
+    league_frame_image: string;
+    league_blank_image: string;
+    league_image: string;
+    division_number: number;
+    division_image: string;
+    portrait_image: string;
+    title: string;
+    guild_id: string;
+    guild_name: string;
+    guild_url: string;
+    mods: any[];
 }
 
 export const DEFAULT_USER: User = {
