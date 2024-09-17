@@ -2,10 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
 import { DEFAULT_USER, User } from '../../models/user.model';
 import { UserDataService } from '../../services/user-data/user-data.service';
-import { Units } from '../../models/unit.model';
-import { UserDataType } from '../../models/unit-service.model';
-import { Mods } from '../../models/mod.model';
-import { Datacrons } from '../../models/datacron.model';
+import { Unit } from '../../models/unit.model';
+import { Mod } from '../../models/mod.model';
+import { Datacron } from '../../models/datacron.model';
 
 @Component({
   selector: 'app-team-planner',
@@ -17,23 +16,10 @@ import { Datacrons } from '../../models/datacron.model';
 export class TeamPlannerComponent implements OnInit {
 
   user: User = DEFAULT_USER;
-  units: Units = {
-    timestamp: 0,
-    userDataType: UserDataType.UNITS,
-    data: []
-  };
-
-  mods: Mods = {
-    timestamp: 0,
-    userDataType: UserDataType.MODS,
-    data: []
-  };
-
-  datacrons: Datacrons = {
-    timestamp: 0,
-    userDataType: UserDataType.DATACRONS,
-    data: []
-  };
+  units: Unit[] = [];
+  mods: Mod[] = [];
+  datacrons: Datacron[] = [];
+  
 
   constructor(
     private authService: AuthService,

@@ -2,10 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { catchError, firstValueFrom, Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Mods } from '../../models/mod.model';
-import { Datacrons } from '../../models/datacron.model';
+import { Datacron, DatacronAffixTemplate } from '../../models/datacron.model';
 import { User } from '../../models/user.model';
-import { Units } from '../../models/unit.model';
+import { Character, UnitGameData } from '../../models/character.model';
+import { Gear } from '../../models/gear.model';
+import { Ship } from '../../models/ship.model';
+import { Ability } from '../../models/ability.model';
+import { DatacronSet } from '../../models/datacron-sets.model';
+import { Stat } from '../../models/stat.model';
+import { Unit } from '../../models/unit.model';
+import { Mod } from '../../models/mod.model';
 
 interface CacheItem {
   timestamp: number;
@@ -75,60 +81,61 @@ export class SwgohApiService {
   // API Requests
   //-------------------------------------------------------------------------------------------------
 
+  // UserData
+
   async getPlayerProfile(allyCode: number): Promise<User> {
     const playerProfile = await this.sendRequest(`${this.baseUrl}/player/${allyCode}/`);
     return playerProfile.data;
   }
 
-  async getUnits(allyCode: number): Promise<Units> {
+  async getUnits(allyCode: number): Promise<Unit[]> {
     const playerProfile = await this.sendRequest(`${this.baseUrl}/player/${allyCode}/`);
     return playerProfile.units;
   }
 
-  async getMods(allyCode: number): Promise<Mods> {
+  async getMods(allyCode: number): Promise<Mod[]> {
     const playerProfile = await this.sendRequest(`${this.baseUrl}/player/${allyCode}/`);
     return playerProfile.mods;
   }
 
-  async getDatacrons(allyCode: number): Promise<Datacrons> {
+  async getDatacrons(allyCode: number): Promise<Datacron[]> {
     const playerProfile = await this.sendRequest(`${this.baseUrl}/player/${allyCode}/`);
     return playerProfile.datacrons;
   }
 
+  // Game Data
+  
+  async getCharacters(): Promise<Character[]> {
+    return this.sendRequest(`${this.baseUrl}/characters/`);
+  }
 
-  // getCharacters(): Observable<any> {
-  //   return this.http.get(`${this.baseUrl}/characters/`);
-  // }
+  async getShips(): Promise<Ship[]> {
+    return this.sendRequest(`${this.baseUrl}/ships/`);
+  }
 
-  // getShips(): Observable<any> {
-  //   return this.http.get(`${this.baseUrl}/ships/`);
-  // }
+  async getGear(): Promise<Gear[]> {
+    return this.sendRequest(`${this.baseUrl}/gear/`);
+  }
 
-  // getGear(): Observable<any> {
-  //   return this.http.get(`${this.baseUrl}/gear/`);
-  // }
+  async getAbilities(): Promise<Ability[]> {
+    return this.sendRequest(`${this.baseUrl}/abilities/`);
+  }
 
-  // getAbilities(): Observable<any> {
-  //   return this.http.get(`${this.baseUrl}/abilities/`);
-  // }
+  async getDatacronSets(): Promise<DatacronSet[]> {
+    return this.sendRequest(`${this.baseUrl}/datacron-sets/`);
+  }
 
-  // getStatDefinitions(): Observable<any> {
-  //   return this.http.get(`${this.baseUrl}/stat-definitions/`);
-  // }
+  async getDatacronAffixTemplates(): Promise<DatacronAffixTemplate[]> {
+    return this.sendRequest(`${this.baseUrl}/datacron-affix-templates/`);
+  }
 
-  // getDatacronAffixTemplateSets(): Observable<any> {
-  //   return this.http.get(`${this.baseUrl}/datacron-affix-template-sets/`);
-  // }
+  async getStatDefinitions(): Promise<Stat[]> {
+    return this.sendRequest(`${this.baseUrl}/stat-definitions/`);
+  }
 
-  // getDatacronSets(): Observable<any> {
-  //   return this.http.get(`${this.baseUrl}/datacron-sets/`);
-  // }
+  async getUnitGameData(): Promise<UnitGameData[]> {
+    return this.sendRequest(`${this.baseUrl}/units/`);
+  }
 
-  // getDatacronTemplates(): Observable<any> {
-  //   return this.http.get(`${this.baseUrl}/datacron-templates/`);
-  // }
-
-  // getGuildProfile(guildId: string): Observable<any> {
-  //   return this.http.get(`${this.baseUrl}/guild-profile/${guildId}/`);
-  // }
+  // getGuild(guildId)
 }

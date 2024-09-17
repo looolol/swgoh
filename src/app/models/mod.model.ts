@@ -1,12 +1,3 @@
-import { IUserData, UserDataType } from "./unit-service.model";
-
-
-export interface Mods extends IUserData {
-    timestamp: number;
-    userDataType: UserDataType.MODS;
-    data: Mod[];
-}
-
 export type Mod = {
     id: string;
     level: number;

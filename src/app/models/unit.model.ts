@@ -1,12 +1,3 @@
-import { IUserData, UserDataType } from "./unit-service.model";
-
-
-export interface Units extends IUserData {
-    timestamp: number;
-    userDataType: UserDataType.UNITS;
-    data: Unit[];
-}
-
 export type Unit = {
     data: {
         base_id: string;

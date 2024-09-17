@@ -1,12 +1,3 @@
-import { IUserData, UserDataType } from "./unit-service.model";
-
-
-export interface Datacrons extends IUserData {
-    timestamp: number;
-    userDataType: UserDataType.DATACRONS;
-    data: Datacron[];
-}
-
 export type Datacron = {
     id: string;
     set_id: number;
@@ -30,7 +21,7 @@ export type Datacron = {
     url: string;
 }
 
-export type DatacronGameData = {
+export type DatacronAffixTemplate = {
     base_id: string;
     affix_templates: {
         ability_id: string;

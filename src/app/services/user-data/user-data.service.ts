@@ -1,119 +1,37 @@
 import { Injectable } from '@angular/core';
-import { StorageService } from '../storage/storage.service';
-import { environment } from '../../../environments/environment';
+import { StoreService } from '../store/store.service';
 import { SwgohApiService } from '../swgoh-api/swgoh-api.service';
-import { IUserData, UserData, UserDataType } from '../../models/unit-service.model';
-import { Mods } from '../../models/mod.model';
-import { Datacrons } from '../../models/datacron.model';
-import { Units } from '../../models/unit.model';
-
+import { User } from '../../models/user.model';
+import { StorageService } from '../storage/storage.service';
+import { Unit } from '../../models/unit.model';
+import { Mod } from '../../models/mod.model';
+import { Datacron } from '../../models/datacron.model';
 
 @Injectable({
   providedIn: 'root'
 })
-export class UserDataService {
-
+export class UserDataService extends StoreService {
   constructor(
-    private swgohApiService: SwgohApiService,
-    private storageService: StorageService
-  ) { }
-
-  private getKey(userId: number, userDataType: UserDataType): string {
-    return `${userId}_userData_${userDataType}`;
+    storageService: StorageService,
+    private swgohApiService: SwgohApiService
+  ) {
+    super(storageService);
+    this.cacheDuration = 5 * 60 * 1000; // 5 minutes in milliseconds
   }
 
-  private getDefaultUserData(userDataType: UserDataType): IUserData {
-    return {
-      timestamp: 0,
-      userDataType: userDataType,
-      data: []
-    }
+  async getUser(allyCode: number): Promise<User> {
+    return this.fetchAndCacheData(`${allyCode}_user`, () => this.swgohApiService.getPlayerProfile(allyCode));
   }
 
-
-  async getUnits(userId: number): Promise<Units> {
-    const cachedUnits = await this.getUserDataByType(userId, UserDataType.UNITS);
-    if (this.isDataValid(cachedUnits)) {
-      return cachedUnits as Units;
-    }
-
-    const apiUnits = await this.swgohApiService.getUnits(userId);
-    await this.saveUserDataByType(userId, UserDataType.UNITS, apiUnits);
-    return apiUnits;
+  async getUnits(allyCode: number): Promise<Unit[]> {
+    return this.fetchAndCacheData(`${allyCode}_units`, () => this.swgohApiService.getUnits(allyCode));
   }
 
-  async getMods(userId: number): Promise<Mods> {
-    const cachedMods = await this.getUserDataByType(userId, UserDataType.MODS);
-    if (this.isDataValid(cachedMods)) {
-      return cachedMods as Mods;
-    }
-
-    const apiMods = await this.swgohApiService.getMods(userId);
-    await this.saveUserDataByType(userId, UserDataType.MODS, apiMods);
-    return apiMods;
+  async getMods(allyCode: number): Promise<Mod[]> {
+    return this.fetchAndCacheData(`${allyCode}_mods`, () => this.swgohApiService.getMods(allyCode));
   }
 
-  async getDatacrons(userId: number): Promise<Datacrons> {
-    const cachedDatacrons = await this.getUserDataByType(userId, UserDataType.DATACRONS);
-    if (this.isDataValid(cachedDatacrons)) {
-      return cachedDatacrons as Datacrons;
-    }
-
-    const apiDatacrons = await this.swgohApiService.getDatacrons(userId);
-    await this.saveUserDataByType(userId, UserDataType.DATACRONS, apiDatacrons);
-    return apiDatacrons;
-  }
-
-
-
-  async getUserDataByType(userId: number, userDataType: UserDataType): Promise<IUserData> {
-    const userData = await this.storageService.getItem(this.getKey(userId, userDataType));
-    return userData ? JSON.parse(userData) : this.getDefaultUserData(userDataType);
-  }
-
-  async saveUserDataByType(userId: number, userDataType: UserDataType, userData: IUserData): Promise<void> {
-    userData.timestamp = Date.now();
-    await this.storageService.setItem(this.getKey(userId, userDataType), JSON.stringify(userData));
-  }
-
-  async deleteUserDataByType(userId: number, userDataType: UserDataType): Promise<void> {
-    await this.storageService.removeItem(this.getKey(userId, userDataType));
-  }
-
-
-  async getUserData(userId: number): Promise<UserData> {
-    const allUserData: UserData = {} as UserData;
-
-    for (const dataType of Object.values(UserDataType)) {
-      allUserData[dataType] = await this.getUserDataByType(userId, dataType);
-    }
-
-    return allUserData;
-  }
-
-  async saveUserData(userId: number, userData: UserData): Promise<void> {
-    const savePromises = Object.entries(userData).map(([dataType, userDataType]) => 
-      this.saveUserDataByType(userId, dataType as UserDataType, userDataType)
-    );
-    await Promise.all(savePromises);
-  }
-
-  async deleteUserData(userId: number): Promise<void> {
-    const deletePromises = Object.values(UserDataType).map(dataType => 
-      this.deleteUserDataByType(userId, dataType)
-    );
-    await Promise.all(deletePromises);
-  }
-
-
-
-  private isDataValid(userData: IUserData): boolean {
-    if (!environment.production) {
-      console.log('Development mode: Always treating data as invalid');
-      return false;
-    }
-
-    const expirationTime = 60 * 60 * 24 * 1000; // 1 day
-    return userData.timestamp > Date.now() - expirationTime;
+  async getDatacrons(allyCode: number): Promise<Datacron[]> {
+    return this.fetchAndCacheData(`${allyCode}_datacrons`, () => this.swgohApiService.getDatacrons(allyCode));
   }
 }
