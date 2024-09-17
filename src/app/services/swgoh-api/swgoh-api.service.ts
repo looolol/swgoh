@@ -2,7 +2,10 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { catchError, firstValueFrom, Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { Mods } from '../../models/mod.model';
+import { Datacrons } from '../../models/datacron.model';
 import { User } from '../../models/user.model';
+import { Units } from '../../models/unit.model';
 
 
 @Injectable({
@@ -48,10 +51,33 @@ export class SwgohApiService {
     return playerProfile.data;
   }
 
+  async getUnits(allyCode: number): Promise<Units> {
+    console.log('allyCode', allyCode);
+    console.log('url', `${this.baseUrl}/units/${allyCode}/`);
 
-  // getUnits(): Observable<any> {
-  //   return this.http.get(`${this.baseUrl}/units/`);
-  // }
+    const playerProfile = await this.sendRequest(`${this.baseUrl}/player/${allyCode}/`);
+
+    return playerProfile.units;
+  }
+
+  async getMods(allyCode: number): Promise<Mods> {
+    console.log('allyCode', allyCode);
+    console.log('url', `${this.baseUrl}/units/${allyCode}/`);
+
+    const playerProfile = await this.sendRequest(`${this.baseUrl}/player/${allyCode}/`);
+
+    return playerProfile.mods;
+  }
+
+  async getDatacrons(allyCode: number): Promise<Datacrons> {
+    console.log('allyCode', allyCode);
+    console.log('url', `${this.baseUrl}/units/${allyCode}/`);
+
+    const playerProfile = await this.sendRequest(`${this.baseUrl}/player/${allyCode}/`);
+
+    return playerProfile.datacrons;
+  }
+
 
   // getCharacters(): Observable<any> {
   //   return this.http.get(`${this.baseUrl}/characters/`);

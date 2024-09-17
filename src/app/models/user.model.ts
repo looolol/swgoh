@@ -1,7 +1,3 @@
-import { Datacron } from "./datacron.model";
-import { Mod } from "./mod.model";
-import { Unit } from "./unit.model";
-
 export type User = {    
     ally_code: number;
     arena_leader_base_id: string;
@@ -104,19 +100,4 @@ export const DEFAULT_USER: User = {
     guild_name: '',
     guild_url: '',
     mods: []
-};
-
-
-export type UserData = {
-    timestamp: number;
-    units: Unit[];
-    mods: Mod[];
-    datacrons: Datacron[];
-}
-
-export const DEFAULT_USER_DATA: UserData = {
-    timestamp: 0,
-    units: [],
-    mods: [],
-    datacrons: []
 };

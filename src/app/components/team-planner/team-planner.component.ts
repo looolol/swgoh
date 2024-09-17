@@ -1,8 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { SwgohApiService } from '../../services/swgoh-api/swgoh-api.service';
 import { AuthService } from '../../services/auth/auth.service';
-import { DEFAULT_USER, DEFAULT_USER_DATA, User, UserData } from '../../models/user.model';
+import { DEFAULT_USER, User } from '../../models/user.model';
 import { UserDataService } from '../../services/user-data/user-data.service';
+import { Units } from '../../models/unit.model';
+import { UserDataType } from '../../models/unit-service.model';
+import { Mods } from '../../models/mod.model';
+import { Datacrons } from '../../models/datacron.model';
 
 @Component({
   selector: 'app-team-planner',
@@ -14,10 +17,25 @@ import { UserDataService } from '../../services/user-data/user-data.service';
 export class TeamPlannerComponent implements OnInit {
 
   user: User = DEFAULT_USER;
-  userData: UserData = DEFAULT_USER_DATA;
+  units: Units = {
+    timestamp: 0,
+    userDataType: UserDataType.UNITS,
+    data: []
+  };
+
+  mods: Mods = {
+    timestamp: 0,
+    userDataType: UserDataType.MODS,
+    data: []
+  };
+
+  datacrons: Datacrons = {
+    timestamp: 0,
+    userDataType: UserDataType.DATACRONS,
+    data: []
+  };
 
   constructor(
-    private swgohApiService: SwgohApiService,
     private authService: AuthService,
     private userDataService: UserDataService,
   ) {}
@@ -28,25 +46,30 @@ export class TeamPlannerComponent implements OnInit {
 
   private async loadUserData(): Promise<void> {
     try {
-      this.user = await this.authService.getCurrentUser();
+      this.user = await this.authService.getCurrentUser(); 
+      console.log("Got user", this.user);
 
-      if (!(await this.userDataService.isExpired(this.user.ally_code))) {
-        this.userData = await this.userDataService.getUserData(this.user.ally_code);
-      } else {
-        this.loadPlayer();
-      }
+      this.units = await this.userDataService.getUnits(this.user.ally_code);
+      console.log("Got units", this.units);
+
+      this.mods = await this.userDataService.getMods(this.user.ally_code);
+      console.log("Got mods", this.mods);
+
+      this.datacrons = await this.userDataService.getDatacrons(this.user.ally_code);
+      console.log("Got datacrons", this.datacrons);
+
     } catch (error) {
       console.error('Error loading user data:', error);
       //handle error
     }
   }
 
-  private async loadPlayer(): Promise<void> {
+  // private async loadPlayer(): Promise<void> {
 
-    const data = await this.swgohApiService.getPlayerProfile(this.user.ally_code);
+  //   const data = await this.swgohApiService.getPlayerProfile(this.user.ally_code);
 
-    // update userData with fetched data
+  //   // update userData with fetched data
 
-    this.userDataService.saveUserData(this.user.ally_code, this.userData);
-  }
+  //   this.userDataService.saveUserData(this.user.ally_code, this.userData);
+  // }
 }
