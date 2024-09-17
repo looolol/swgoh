@@ -5,13 +5,16 @@
     </mat-card-header>
 
     <mat-card-content>
-      <cdk-virtual-scroll-viewport itemSize="{{itemSize}}" class="character-scroll">
+      <cdk-virtual-scroll-viewport itemSize="{{itemSize}}" class="character-scroll" (scrolledIndexChange)="loadNextBatch()">
         <div class="character-grid">
-          <div *ngFor="let unit of unassignedTeam.units;" class="character-item">
+          <div *ngFor="let unit of displayedUnits" class="character-item">
             <app-character [unit]="unit" [characters]="gameDataStore.characters"></app-character>
           </div>
         </div>
       </cdk-virtual-scroll-viewport>
+      <div *ngIf="isLoading" class="loading-spinner">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
     </mat-card-content>
   </mat-card>
 </div>

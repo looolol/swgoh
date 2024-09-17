@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { Unit } from '../../../models/user-data/unit.model';
 import { Character } from '../../../models/game-data/character.model';
 import { CommonModule } from '@angular/common';
@@ -12,22 +12,21 @@ import { CommonModule } from '@angular/common';
   templateUrl: './character.component.html',
   styleUrl: './character.component.scss'
 })
-export class CharacterComponent {
-
+export class CharacterComponent implements OnInit {
   @Input() unit!: Unit;
   @Input() characters: Character[] = [];
 
   character: Character | undefined;
   stars: {src: string, class: string} [] = [];
+  imageLoaded = false;
 
   ngOnInit() {
-    console.log("Unit", this.unit);
     this.character = this.characters.find(c => c.base_id === this.unit.data.base_id);
-    console.log("Unit Def Found: ", this.unit.data.base_id);
-    console.log("Char Def: ", this.character);
-    console.log("Gear Frame URL: ", this.gearFrameUrl);
-
     this.generateStars();
+  }
+
+  onImageLoad() {
+    this.imageLoaded = true;
   }
 
   get gearFrameUrl(): string {
@@ -57,5 +56,4 @@ export class CharacterComponent {
       ...Array(emptyStars).fill({src: '/images/star-empty.png', class: 'empty-star'})
     ];
   }
-
 }
