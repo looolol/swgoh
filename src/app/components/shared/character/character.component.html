@@ -1,7 +1,7 @@
 <div *ngIf="unit && character" class="character-container">
     <div class="character-frame">
-      <img [src]="character.image" [alt]="character.name" class="character-image" (load)="onImageLoad()" [class.loaded]="imageLoaded">
-      <img [src]="gearFrameUrl" alt="Gear Frame" class="gear-frame" (load)="onImageLoad()" [class.loaded]="imageLoaded">
+      <img [src]="cachedImageSrc" [alt]="character.name" class="character-image" (load)="onImageLoad()" [class.loaded]="imageLoaded">
+      <img [src]="cachedGearFrameSrc" alt="Gear Frame" class="gear-frame" (load)="onImageLoad()" [class.loaded]="imageLoaded">
     </div>
     <div class="star-rating">
       <img *ngFor="let star of stars" [src]="star.src" [ngClass]="star.class" alt="Star" class="star-image">

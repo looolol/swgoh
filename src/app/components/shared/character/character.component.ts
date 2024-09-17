@@ -19,10 +19,20 @@ export class CharacterComponent implements OnInit {
   character: Character | undefined;
   stars: {src: string, class: string} [] = [];
   imageLoaded = false;
+  cachedImageSrc = '';
+  cachedGearFrameSrc = '';
 
   ngOnInit() {
     this.character = this.characters.find(c => c.base_id === this.unit.data.base_id);
     this.generateStars();
+    this.cacheImages();
+  }
+
+  cacheImages() {
+    if (this.character) {
+      this.cachedImageSrc = this.character.image;
+      this.cachedGearFrameSrc = this.gearFrameUrl;
+    }
   }
 
   onImageLoad() {

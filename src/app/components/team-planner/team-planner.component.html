@@ -1,19 +1,27 @@
 <div class="team-planner-container">
+  <div class="content-area">
+    <!-- Future content will go here -->
+    <p>Content area for future use</p>
+  </div>
+  
   <mat-card class="character-list">
     <mat-card-header>
       <mat-card-title>All Characters</mat-card-title>
     </mat-card-header>
 
     <mat-card-content>
-      <cdk-virtual-scroll-viewport itemSize="{{itemSize}}" class="character-scroll" (scrolledIndexChange)="loadNextBatch()">
+      <mat-form-field class="search-bar">
+        <input matInput placeholder="Search characters" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()">
+      </mat-form-field>
+      <div #characterScroll class="character-scroll">
         <div class="character-grid">
-          <div *ngFor="let unit of displayedUnits" class="character-item">
+          <div *ngFor="let unit of displayedUnits; trackBy: trackByBaseId" class="character-item">
             <app-character [unit]="unit" [characters]="gameDataStore.characters"></app-character>
           </div>
         </div>
-      </cdk-virtual-scroll-viewport>
-      <div *ngIf="isLoading" class="loading-spinner">
-        <mat-spinner diameter="40"></mat-spinner>
+        <div class="loading-spinner" *ngIf="isLoading">
+          <mat-spinner diameter="40"></mat-spinner>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
 import { UserDataService } from '../../services/user-data/user-data.service';
 import { GameDataStore, InitGameDataStore, InitUserDataStore, UserDataStore } from '../../models/store.model';
@@ -7,9 +7,10 @@ import { Unit } from '../../models/user-data/unit.model';
 import { CommonModule } from '@angular/common';
 import { CharacterComponent } from '../shared/character/character.component';
 import { MatCardModule } from '@angular/material/card';
-import { ScrollingModule } from '@angular/cdk/scrolling';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Character } from '../../models/game-data/character.model';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule } from '@angular/forms';
 
 export interface Team {
   name: string;
@@ -23,30 +24,27 @@ export interface Team {
     CommonModule,
     CharacterComponent,
     MatCardModule,
-    ScrollingModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatInputModule,
+    MatFormFieldModule,
+    FormsModule
   ],
   templateUrl: './team-planner.component.html',
   styleUrl: './team-planner.component.scss'
 })
-export class TeamPlannerComponent implements OnInit {
+export class TeamPlannerComponent implements OnInit, AfterViewInit {
+  @ViewChild('characterScroll') characterScroll!: ElementRef;
 
   userDataStore: UserDataStore = InitUserDataStore;
   gameDataStore: GameDataStore = InitGameDataStore;
 
-  teams: Team[] = [];
-  unassignedTeam: Team = {
-    name: 'Unassigned',
-    units: []
-  };
-
+  unassignedTeam: Unit[] = [];
   displayedUnits: Unit[] = [];
+  filteredUnits: Unit[] = [];
+
   batchSize = 50;
-  currentBatch = 0;
-
-  itemSize = 130; // Approximate height of each character item
-
   isLoading = false;
+  searchTerm = '';
 
   constructor(
     private authService: AuthService,
@@ -58,45 +56,52 @@ export class TeamPlannerComponent implements OnInit {
     this.loadUserData();
   }
 
+  ngAfterViewInit(): void {
+    this.characterScroll.nativeElement.addEventListener('scroll', this.onScroll.bind(this));
+  }
+
   private async loadUserData(): Promise<void> {
     const user = await this.authService.getCurrentUser();
-    console.log('user', user);
     this.userDataStore = await this.userDataService.getStore(user.ally_code);
     this.gameDataStore = await this.gameDataService.getStore();
 
-    const lockedUnits: Character[] = [];
-    this.gameDataStore.characters.forEach(character => {
-      const unit = this.userDataStore.units.find(unit => unit.data.name === character.name);
-      if (unit) {
-        this.unassignedTeam.units.push(unit);
-      } else {
-        lockedUnits.push(character);
-      }
-    });
+    this.unassignedTeam = this.userDataStore.units.filter(unit => 
+      this.gameDataStore.characters.some(char => char.base_id === unit.data.base_id)
+    );
 
-    this.unassignedTeam.units.sort((a, b) => b.data.power - a.data.power);
-
+    this.unassignedTeam.sort((a, b) => b.data.power - a.data.power);
+    this.filteredUnits = this.unassignedTeam;
     this.loadNextBatch();
-
-    console.log('userDataStore', this.userDataStore);
-    console.log('gameDataStore', this.gameDataStore);
-
-    console.log('unassignedTeam', this.unassignedTeam.units);
-    console.log('lockedUnits', lockedUnits);
   }
 
   loadNextBatch(): void {
-    if (this.isLoading || this.displayedUnits.length >= this.unassignedTeam.units.length) {
+    if (this.isLoading || this.displayedUnits.length >= this.filteredUnits.length) {
       return;
     }
 
     this.isLoading = true;
-    setTimeout(() => {
-      const start = this.currentBatch * this.batchSize;
-      const end = start + this.batchSize;
-      this.displayedUnits = [...this.displayedUnits, ...this.unassignedTeam.units.slice(start, end)];
-      this.currentBatch++;
-      this.isLoading = false;
-    }, 500); // Simulate a delay for demonstration purposes
+    const start = this.displayedUnits.length;
+    const end = Math.min(start + this.batchSize, this.filteredUnits.length);
+    this.displayedUnits = [...this.displayedUnits, ...this.filteredUnits.slice(start, end)];
+    this.isLoading = false;
+  }
+
+  onSearch(): void {
+    this.filteredUnits = this.unassignedTeam.filter(unit =>
+      unit.data.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
+    this.displayedUnits = [];
+    this.loadNextBatch();
+  }
+
+  onScroll(): void {
+    const element = this.characterScroll.nativeElement;
+    if (element.scrollHeight - element.scrollTop <= element.clientHeight + 100) {
+      this.loadNextBatch();
+    }
+  }
+
+  trackByBaseId(index: number, unit: Unit): string {
+    return unit.data.base_id;
   }
 }
