@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { StoreService } from '../store/store.service';
 import { SwgohApiService } from '../swgoh-api/swgoh-api.service';
-import { Character } from '../../models/character.model';
-import { Ship } from '../../models/ship.model';
-import { Gear } from '../../models/gear.model';
-import { Ability } from '../../models/ability.model';
-import { DatacronSet } from '../../models/datacron-sets.model';
-import { Stat } from '../../models/stat.model';
+import { Character } from '../../models/game-data/character.model';
+import { Ship } from '../../models/game-data/ship.model';
+import { Gear } from '../../models/game-data/gear.model';
+import { Ability } from '../../models/game-data/ability.model';
+import { DatacronSet } from '../../models/game-data/datacron-sets.model';
+import { Stat } from '../../models/game-data/stat.model';
 import { StorageService } from '../storage/storage.service';
+import { GameDataStore } from '../../models/store.model';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,17 @@ export class GameDataService extends StoreService {
   ) {
     super(storageService);
     this.cacheDuration = 7 * 24 * 60 * 60 * 1000; // 7 days in milliseconds
+  }
+
+  async getStore(): Promise<GameDataStore> {
+    return {
+      characters: await this.getCharacters(),
+      ships: await this.getShips(),
+      gear: await this.getGear(),
+      abilities: await this.getAbilities(),
+      datacronSets: await this.getDatacronSets(),
+      statDefinitions: await this.getStatDefinitions()
+    };
   }
 
   async getCharacters(): Promise<Character[]> {

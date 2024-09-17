@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
-import { User, DEFAULT_USER } from '../../models/user.model';
+import { User, DEFAULT_USER } from '../../models/user-data/user.model';
 import { SwgohApiService } from '../swgoh-api/swgoh-api.service';
 
 interface LoginMethod {

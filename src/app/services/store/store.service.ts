@@ -5,10 +5,12 @@ import { CachedData } from '../../models/cached-data.model';
 @Injectable({
   providedIn: 'root'
 })
-export class StoreService {
-  protected cacheDuration: number = 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+export abstract class StoreService {
+  protected cacheDuration: number = 0;
 
   constructor(protected storageService: StorageService) {}
+
+  abstract getStore(identifier?: any): Promise<any>;
 
   protected async getFromCache<T>(key: string): Promise<CachedData<T> | null> {
     const cachedData = await this.storageService.getItem(key);

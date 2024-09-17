@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
-import { DEFAULT_USER, User } from '../../models/user.model';
+import { DEFAULT_USER, User } from '../../models/user-data/user.model';
 
 @Component({
   selector: 'app-ships',

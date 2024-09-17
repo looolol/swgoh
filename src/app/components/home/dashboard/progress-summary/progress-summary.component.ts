@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input } from '@angular/core';
-import { DEFAULT_USER, User } from '../../../../models/user.model';
+import { DEFAULT_USER, User } from '../../../../models/user-data/user.model';
 import { MatCardModule } from '@angular/material/card';
 
 @Component({

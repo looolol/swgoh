@@ -3,7 +3,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { ProgressSummaryComponent } from './progress-summary/progress-summary.component';
 import { RouterLink } from '@angular/router';
-import { DEFAULT_USER, User } from '../../../models/user.model';
+import { DEFAULT_USER, User } from '../../../models/user-data/user.model';
 import { CommonModule } from '@angular/common';
 import { environment } from '../../../../environments/environment';
 

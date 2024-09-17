@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { LoginFormComponent } from './login-form/login-form.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { User, DEFAULT_USER } from '../../models/user.model';
+import { User, DEFAULT_USER } from '../../models/user-data/user.model';
 
 
 @Component({

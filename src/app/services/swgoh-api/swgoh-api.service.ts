@@ -2,16 +2,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { catchError, firstValueFrom, Observable, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { Datacron, DatacronAffixTemplate } from '../../models/datacron.model';
-import { User } from '../../models/user.model';
-import { Character, UnitGameData } from '../../models/character.model';
-import { Gear } from '../../models/gear.model';
-import { Ship } from '../../models/ship.model';
-import { Ability } from '../../models/ability.model';
-import { DatacronSet } from '../../models/datacron-sets.model';
-import { Stat } from '../../models/stat.model';
-import { Unit } from '../../models/unit.model';
-import { Mod } from '../../models/mod.model';
+import { Datacron, DatacronAffixTemplate } from '../../models/user-data/datacron.model';
+import { User } from '../../models/user-data/user.model';
+import { Character, UnitGameData } from '../../models/game-data/character.model';
+import { Gear } from '../../models/game-data/gear.model';
+import { Ship } from '../../models/game-data/ship.model';
+import { Ability } from '../../models/game-data/ability.model';
+import { DatacronSet } from '../../models/game-data/datacron-sets.model';
+import { Stat } from '../../models/game-data/stat.model';
+import { Unit } from '../../models/user-data/unit.model';
+import { Mod } from '../../models/user-data/mod.model';
 
 interface CacheItem {
   timestamp: number;

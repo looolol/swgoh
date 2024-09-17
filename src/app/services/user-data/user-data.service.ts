@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { StoreService } from '../store/store.service';
 import { SwgohApiService } from '../swgoh-api/swgoh-api.service';
-import { User } from '../../models/user.model';
+import { User } from '../../models/user-data/user.model';
 import { StorageService } from '../storage/storage.service';
-import { Unit } from '../../models/unit.model';
-import { Mod } from '../../models/mod.model';
-import { Datacron } from '../../models/datacron.model';
+import { Unit } from '../../models/user-data/unit.model';
+import { Mod } from '../../models/user-data/mod.model';
+import { Datacron } from '../../models/user-data/datacron.model';
+import { UserDataStore } from '../../models/store.model';
 
 @Injectable({
   providedIn: 'root'
@@ -17,6 +18,15 @@ export class UserDataService extends StoreService {
   ) {
     super(storageService);
     this.cacheDuration = 5 * 60 * 1000; // 5 minutes in milliseconds
+  }
+
+  async getStore(allyCode: number): Promise<UserDataStore> {
+    return {
+      user: await this.getUser(allyCode),
+      units: await this.getUnits(allyCode),
+      mods: await this.getMods(allyCode),
+      datacrons: await this.getDatacrons(allyCode)
+    };
   }
 
   async getUser(allyCode: number): Promise<User> {
