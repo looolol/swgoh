@@ -7,16 +7,29 @@ import { Datacrons } from '../../models/datacron.model';
 import { User } from '../../models/user.model';
 import { Units } from '../../models/unit.model';
 
+interface CacheItem {
+  timestamp: number;
+  data: any;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class SwgohApiService {
+
   private baseUrl = environment.swgoh_api;
+  private cache: { [key: string]: CacheItem} = {};
+  private cacheDuration = 5 * 60 * 1000; // 5 minutes in milliseconds
 
   constructor(private http: HttpClient) { }
 
-  private sendRequest(url: string): Promise<any> {
+  private async sendRequest(url: string): Promise<any> {
+    // Check cache first
+    const cachedData = this.getFromCache(url);
+    if (cachedData) {
+      return cachedData.data;
+    }
+
     const headers = new HttpHeaders({
       'Content-Type': 'application/json'
     });
@@ -25,7 +38,9 @@ export class SwgohApiService {
       catchError(this.handleError)
     );
 
-    return firstValueFrom(observable);
+    const data = await firstValueFrom(observable);
+    this.addToCache(url, data);
+    return data;
   }
 
   private handleError(error: HttpErrorResponse) {
@@ -41,40 +56,42 @@ export class SwgohApiService {
     return throwError(() => new Error(errorMessage));
   }
 
+  private getFromCache(key: string): CacheItem | null {
+    const item = this.cache[key];
+    if (item && Date.now() - item.timestamp < this.cacheDuration) {
+      return item;
+    }
+    return null;
+  }
+ 
+  private addToCache(key: string, data: any) {
+    this.cache[key] = {
+      timestamp: Date.now(),
+      data: data
+    };
+  }
+
+  //------------------------------------------------------------------------------------------------- 
+  // API Requests
+  //-------------------------------------------------------------------------------------------------
 
   async getPlayerProfile(allyCode: number): Promise<User> {
-    console.log('allyCode', allyCode);
-    console.log('url', `${this.baseUrl}/player/${allyCode}/`);
-
     const playerProfile = await this.sendRequest(`${this.baseUrl}/player/${allyCode}/`);
-
     return playerProfile.data;
   }
 
   async getUnits(allyCode: number): Promise<Units> {
-    console.log('allyCode', allyCode);
-    console.log('url', `${this.baseUrl}/units/${allyCode}/`);
-
     const playerProfile = await this.sendRequest(`${this.baseUrl}/player/${allyCode}/`);
-
     return playerProfile.units;
   }
 
   async getMods(allyCode: number): Promise<Mods> {
-    console.log('allyCode', allyCode);
-    console.log('url', `${this.baseUrl}/units/${allyCode}/`);
-
     const playerProfile = await this.sendRequest(`${this.baseUrl}/player/${allyCode}/`);
-
     return playerProfile.mods;
   }
 
   async getDatacrons(allyCode: number): Promise<Datacrons> {
-    console.log('allyCode', allyCode);
-    console.log('url', `${this.baseUrl}/units/${allyCode}/`);
-
     const playerProfile = await this.sendRequest(`${this.baseUrl}/player/${allyCode}/`);
-
     return playerProfile.datacrons;
   }
 

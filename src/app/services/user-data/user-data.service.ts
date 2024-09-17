@@ -19,7 +19,7 @@ export class UserDataService {
   ) { }
 
   private getKey(userId: number, userDataType: UserDataType): string {
-    return `userData_${userId}_${userDataType}`;
+    return `${userId}_userData_${userDataType}`;
   }
 
   private getDefaultUserData(userDataType: UserDataType): IUserData {
@@ -73,7 +73,6 @@ export class UserDataService {
 
   async saveUserDataByType(userId: number, userDataType: UserDataType, userData: IUserData): Promise<void> {
     userData.timestamp = Date.now();
-    console.log("Saving user data", userId, userDataType, this.getKey(userId, userDataType));
     await this.storageService.setItem(this.getKey(userId, userDataType), JSON.stringify(userData));
   }
 
