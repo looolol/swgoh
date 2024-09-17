@@ -3,5 +3,8 @@
       <img [src]="character.image" [alt]="character.name" class="character-image">
       <img [src]="gearFrameUrl" alt="Gear Frame" class="gear-frame">
     </div>
+    <div class="star-rating">
+      <img *ngFor="let star of stars" [src]="star.src" [ngClass]="star.class" alt="Star" class="star-image">
+    </div>
     <p class="character-name">{{character.name}}</p>
 </div>

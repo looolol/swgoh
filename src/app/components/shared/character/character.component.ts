@@ -18,6 +18,7 @@ export class CharacterComponent {
   @Input() characters: Character[] = [];
 
   character: Character | undefined;
+  stars: {src: string, class: string} [] = [];
 
   ngOnInit() {
     console.log("Unit", this.unit);
@@ -25,6 +26,8 @@ export class CharacterComponent {
     console.log("Unit Def Found: ", this.unit.data.base_id);
     console.log("Char Def: ", this.character);
     console.log("Gear Frame URL: ", this.gearFrameUrl);
+
+    this.generateStars();
   }
 
   get gearFrameUrl(): string {
@@ -44,6 +47,15 @@ export class CharacterComponent {
     } else {
       return `images/gear${gearLevel}.png`;
     }
+  }
+
+  generateStars() {
+    const fullStars = this.unit.data.rarity;
+    const emptyStars = 7 - fullStars;
+    this.stars = [
+      ...Array(fullStars).fill({src: '/images/star.png', class: 'full-star'}),
+      ...Array(emptyStars).fill({src: '/images/star-empty.png', class: 'empty-star'})
+    ];
   }
 
 }

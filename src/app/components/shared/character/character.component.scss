@@ -4,7 +4,7 @@
     align-items: center;
     margin: 10px;
     width: 100px;
-    height: 120px;
+    height: 130px; // Slightly increased height to accommodate stars
   }
   
   .character-frame {
@@ -33,9 +33,32 @@
   .character-name {
     text-align: center;
     font-size: 12px;
-    margin-top: 5px;
+    margin-top: 0;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     width: 100%;
+  }
+  
+  .star-rating {
+    display: flex;
+    justify-content: center;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    width: 100%;
+  }
+  
+  .star-image {
+    width: 9px;  // Adjust size as needed
+    height: 9px; // Adjust size as needed
+    margin: 0 1px;
+  }
+
+  .empty-star {
+    // Remove any filters or opacity changes
+    opacity: 1;
+  }
+
+  .full-star {
+    // Ensure this doesn't override the empty star
   }
