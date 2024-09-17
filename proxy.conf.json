@@ -1,0 +1,11 @@
+{
+    "/swgoh-api": {
+        "target": "https://swgoh.gg/api",
+        "secure": true,
+        "changeOrigin": true,
+        "pathRewrite": {
+            "^/swgoh-api": ""
+        },
+        "logLevel": "debug"
+    }
+}

@@ -1,18 +1,51 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { catchError, firstValueFrom, Observable, throwError } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { User } from '../../models/user.model';
+
 
 @Injectable({
   providedIn: 'root'
 })
 export class SwgohApiService {
-  private baseUrl = 'https://swgoh.gg/api';
+  private baseUrl = environment.swgoh_api;
 
   constructor(private http: HttpClient) { }
 
+  private sendRequest(url: string): Promise<any> {
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json'
+    });
 
-  getPlayerProfile(allyCode: string): Observable<any> {
-    return this.http.get(`${this.baseUrl}/player/${allyCode}/`);
+    const observable = this.http.get(url, { headers }).pipe(
+      catchError(this.handleError)
+    );
+
+    return firstValueFrom(observable);
+  }
+
+  private handleError(error: HttpErrorResponse) {
+    let errorMessage = 'An error occurred';
+    if (error.error instanceof ErrorEvent) {
+      // Client-side or network error
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Backend error
+      errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
+    }
+    console.error(errorMessage);
+    return throwError(() => new Error(errorMessage));
+  }
+
+
+  async getPlayerProfile(allyCode: number): Promise<User> {
+    console.log('allyCode', allyCode);
+    console.log('url', `${this.baseUrl}/player/${allyCode}/`);
+
+    const playerProfile = await this.sendRequest(`${this.baseUrl}/player/${allyCode}/`);
+
+    return playerProfile.data;
   }
 
 

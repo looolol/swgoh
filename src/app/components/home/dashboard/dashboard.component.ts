@@ -4,11 +4,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { ProgressSummaryComponent } from './progress-summary/progress-summary.component';
 import { RouterLink } from '@angular/router';
 import { DEFAULT_USER, User } from '../../../models/user.model';
+import { CommonModule } from '@angular/common';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
   imports: [
+    CommonModule,
     ProgressSummaryComponent,
     RouterLink,
     MatCardModule,
@@ -19,12 +22,18 @@ import { DEFAULT_USER, User } from '../../../models/user.model';
 })
 export class DashboardComponent {
   
-  @Input() currentUser: User = DEFAULT_USER;
+  @Input() user: User = DEFAULT_USER;
   @Output() logout = new EventEmitter<void>();
 
-  @Input() progressData: any;
+  swgoh_api = environment.swgoh_gg_url;
 
   handleLogout() {
     this.logout.emit();
+  }
+
+  get formattedAllyCode(): string {
+    return this.user.ally_code.toString().slice(0,3) + '-' + 
+           this.user.ally_code.toString().slice(3,6) + '-' + 
+           this.user.ally_code.toString().slice(6,9);
   }
 }

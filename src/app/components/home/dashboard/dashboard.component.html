@@ -1,28 +1,53 @@
 <mat-card class="dashboard-container">
   <mat-card-header>
+
     <mat-card-title>
-      Welcome, {{ currentUser?.userName }}!
+      <div class="welcome-message">
+        <img mat-card-image [src]="user.portrait_image" alt="{{ user.name }}'s portrait" class="portrait">
+        <span>Welcome,&nbsp;</span>
+        <span class="user-name">
+          <a [href]="swgoh_api + user.url" target="_blank" rel="noopener noreferrer">
+            {{ user.name }}</a>
+        </span>!
+      </div>
     </mat-card-title>
+
     <mat-card-subtitle>
-      Your Ally Code: {{ currentUser?.allyCode }}
+      <div class="quick-summary">
+        <div class="guild-name">
+          <a [href]="swgoh_api + user.guild_url" target="_blank" rel="noopener noreferrer">
+            {{ user.guild_name }}
+          </a>
+        </div>
+        <div class="ally-code">{{ formattedAllyCode }}</div>
+        <div class="last-updated">Last Updated: {{ user.last_updated | date:'short'}}</div>
+      </div>
     </mat-card-subtitle>
   </mat-card-header>
 
-  <mat-card-content>
+  <mat-card-content class="dashboard-content">
 
-    <h2>Quick Actions</h2>
-    <div class="action-buttons">
-      <button mat-raised-button color="primary" routerLink="/team-planner">Team Planner</button>
-      <button mat-raised-button color="primary" routerLink="/farming-plans">Farming Plans</button>
-      <button mat-raised-button color="primary" routerLink="/conquest-planner">Conquest Planner</button>
-    </div>
+    <mat-card class="quick-actions" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Quick Actions</mat-card-title>
+      </mat-card-header>
+      <mat-card-content class="action-buttons">
+          <button mat-raised-button color="primary" routerLink="/team-planner">Team Planner</button>
+          <button mat-raised-button color="primary" routerLink="/farming-plans">Farming Plans</button>
+          <button mat-raised-button color="primary" routerLink="/conquest-planner">Conquest Planner</button>
+      </mat-card-content>
+    </mat-card>
 
-    <h2>Progress Summary</h2>
+    <mat-card class="progress-summary" appearance="outlined">
+      <mat-card-header>
+        <mat-card-title>Progress Summary</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <app-progress-summary [user]="user"></app-progress-summary>
+      </mat-card-content>
+    </mat-card>
 
-
-    <app-progress-summary
-      [progressData]="progressData">
-    </app-progress-summary>
+    <p>Last Updated: {{ user.last_updated | date:'short' }}</p>
 
   </mat-card-content>
 

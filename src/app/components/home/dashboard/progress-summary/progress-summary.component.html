@@ -1,4 +1,26 @@
-<div *ngIf="progressData">
-    <p>Progress!</p>
-    {{ progressData | json }}
+<div *ngIf="user" class="progress-summary">
+    <p class="galactic-power">Galactic Power: {{ user.galactic_power | number:'1.0-0' }}</p>
+
+    <div class="arena-ranks-banner">
+        <div class="arena-rank">
+            <p class="arena-rank-title">Arena Rank</p>
+            <p class="arena-rank-value">{{ user.arena_rank }}</p>
+        </div>
+        <div class="arena-rank">
+            <p class="arena-rank-title">Fleet Arena Rank</p>
+            <p class="arena-rank-value">{{ user.fleet_arena.rank }}</p>
+        </div>
+    </div>
+
+    <div class="league-rank-banner" [ngStyle]="{'--league-color': getLeagueGlowColor()}">
+        <img [src]="user.league_image" [alt]="user.league_name" class="league-icon" [ngStyle]="{'filter': 'drop-shadow(0 0 4px ' + getLeagueGlowColor() + ')'}">
+        <div class="league-info">
+            <p class="league-title">GAC Rank</p>
+            <p class="league-name">{{ user.league_name }} {{ user.division_number }}</p>
+        </div>
+        <div class="skill-rating">
+            <p>Skill Rating</p>
+            <p>{{ user.skill_rating }}</p>
+        </div>
+    </div>
 </div>

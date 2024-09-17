@@ -1,0 +1,98 @@
+.progress-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.league-rank-banner,
+.arena-ranks-banner {
+    display: flex;
+    align-items: center;
+    background: linear-gradient(to right, #2a2a2a, #3a3a3a);
+    border-radius: 8px;
+    padding: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border-left: 4px solid;
+}
+
+.league-rank-banner {
+    justify-content: space-between;
+    border-left-color: var(--league-color);
+}
+
+.arena-ranks-banner {
+    justify-content: space-around; // This will center the arena ranks
+    border-left-color: #4a4a4a;
+}
+
+.league-icon {
+    width: 50px;
+    height: 50px;
+    margin-right: 15px;
+}
+
+.league-info,
+.arena-rank {
+    display: flex;
+    flex-direction: column;
+    align-items: center; // This will center the text within each arena rank
+}
+
+.league-title,
+.arena-rank-title {
+    font-size: 14px;
+    color: #bbb;
+    margin: 0;
+}
+
+.league-name,
+.arena-rank-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    margin: 0;
+}
+
+.skill-rating {
+    text-align: right;
+}
+
+.skill-rating p:first-child {
+    font-size: 14px;
+    color: #bbb;
+    margin: 0;
+}
+
+.skill-rating p:last-child {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    margin: 0;
+}
+
+p {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.arena-rank {
+    text-align: center;
+}
+
+.arena-rank-title {
+    font-size: 14px;
+    color: #bbb;
+    margin: 0;
+}
+
+.arena-rank-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+    margin: 0;
+}
+
+.arena-ranks {
+    display: flex;
+    justify-content: space-between;
+}

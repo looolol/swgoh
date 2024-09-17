@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { StorageService } from '../storage/storage.service';
-import { DEFAULT_USER, DEFAULT_USER_DATA, User } from '../../models/user.model';
+import { User, DEFAULT_USER } from '../../models/user.model';
+import { SwgohApiService } from '../swgoh-api/swgoh-api.service';
 
 interface LoginMethod {
   login(creds: any): Promise<User>;
@@ -8,16 +9,20 @@ interface LoginMethod {
 }
 
 class AllyCodeLogin implements LoginMethod {
-  constructor(private storageService: StorageService) { }
+  constructor(
+    private storageService: StorageService, 
+    private swgohApiService: SwgohApiService
+  ) { }
 
   async login(allyCode: string): Promise<User> {
     if (allyCode?.length === 9 && /^\d+$/.test(allyCode)) {
-      const user: User = {
-        allyCode: allyCode,
-        userName: `Player${allyCode}`, // Generate a default username
-      };
-      await this.storageService.setItem('user', JSON.stringify(user));
-      return user;
+      const parsedAllyCode = parseInt(allyCode, 10);
+
+        const user = await this.swgohApiService.getPlayerProfile(parsedAllyCode);
+        console.log('Fetched user', user);
+
+        await this.storageService.setItem('user', JSON.stringify(user));
+        return user;
     }
     throw new Error('Invalid ally code');
   }
@@ -33,8 +38,11 @@ class AllyCodeLogin implements LoginMethod {
 export class AuthService {
   private loginMethod: LoginMethod;
 
-  constructor(private storageService: StorageService) {
-    this.loginMethod = new AllyCodeLogin(storageService);
+  constructor(
+    private storageService: StorageService, 
+    private swgohApiService: SwgohApiService
+  ) {
+    this.loginMethod = new AllyCodeLogin(storageService, swgohApiService);
   }
 
   async login(allyCode: string): Promise<User> {

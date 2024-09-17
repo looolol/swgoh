@@ -13,9 +13,8 @@
   
   <div class="content-container" *ngIf="isLoggedIn">
     <app-dashboard 
-      [currentUser]="currentUser" 
-      (logout)="handleLogout()"
-      [progressData]="progressData">
+      [user]="user" 
+      (logout)="handleLogout()">
     </app-dashboard>
   </div>
 </div>
