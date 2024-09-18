@@ -1,9 +1,38 @@
-<div class="team-planner-container">
-  <div class="content-area">
-    <!-- Future content will go here -->
-    <p>Content area for future use</p>
+<div #container class="team-planner-container" [class.resizing]="isResizing">
+  <div class="categories-container" [style.width.%]="categoriesWidth">
+    <button mat-raised-button color="primary" (click)="addCategory()">Add Category</button>
+
+    <mat-card *ngFor="let category of categories" class="category-card">
+        <mat-card-header>
+            <mat-card-title>{{ category.name }}</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+            <div *ngFor="let team of category.teams" class="team-row">
+                <div class="team-header">
+                    <h3>{{ team.name }}</h3>
+                    <button mat-icon-button (click)="editTeamName(team, team.name)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="removeTeam(category, team)">
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                </div>
+                <div class="team-units">
+                    <app-character 
+                        *ngFor="let unit of team.units" 
+                        [unit]="unit" 
+                        [characters]="gameDataStore.characters">
+                    </app-character>
+                </div>
+            </div>
+            <button mat-button (click)="addTeam(category)">Add Team</button>
+        </mat-card-content>
+    </mat-card>
   </div>
+
+  <div class="resize-handle" (mousedown)="onResizeStart($event)"></div>
   
+  <div class="character-selection" [style.width.%]="100 - categoriesWidth">
   <mat-card class="character-list">
     <mat-card-header>
       <mat-card-title>All Characters</mat-card-title>
@@ -25,4 +54,6 @@
       </div>
     </mat-card-content>
   </mat-card>
+  </div>
+
 </div>

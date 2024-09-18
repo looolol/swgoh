@@ -11,10 +11,18 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { CdkDragMove, DragDropModule } from '@angular/cdk/drag-drop';
 
 export interface Team {
   name: string;
   units: Unit[];
+}
+
+export interface Category {
+  name: string;
+  teams: Team[];
 }
 
 @Component({
@@ -27,16 +35,34 @@ export interface Team {
     MatProgressSpinnerModule,
     MatInputModule,
     MatFormFieldModule,
-    FormsModule
+    FormsModule,
+    MatButtonModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    DragDropModule
   ],
   templateUrl: './team-planner.component.html',
   styleUrl: './team-planner.component.scss'
 })
 export class TeamPlannerComponent implements OnInit, AfterViewInit {
   @ViewChild('characterScroll') characterScroll!: ElementRef;
+  @ViewChild('container') container!: ElementRef;
 
   userDataStore: UserDataStore = InitUserDataStore;
   gameDataStore: GameDataStore = InitGameDataStore;
+
+  categories: Category[] = [
+    {
+      name: 'Category 1',
+      teams: [
+        {
+          name: 'Team 1',
+          units: []
+        }
+      ]
+    }
+  ];
 
   unassignedTeam: Unit[] = [];
   displayedUnits: Unit[] = [];
@@ -45,6 +71,12 @@ export class TeamPlannerComponent implements OnInit, AfterViewInit {
   batchSize = 50;
   isLoading = false;
   searchTerm = '';
+
+  isResizing: boolean = false;
+  resizeStartX: number = 0;
+  resizeStartWidth: number = 0;
+  containerWidth: number = 0;
+  categoriesWidth: number = 50; // 50% of the screen width
 
   constructor(
     private authService: AuthService,
@@ -58,7 +90,114 @@ export class TeamPlannerComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     this.characterScroll.nativeElement.addEventListener('scroll', this.onScroll.bind(this));
+    this.containerWidth = this.container.nativeElement.offsetWidth;
   }
+
+  onResizeStart(event: MouseEvent): void {
+    this.isResizing = true;
+    this.resizeStartX = event.clientX;
+    this.resizeStartWidth = this.categoriesWidth;
+    document.addEventListener('mousemove', this.onResize);
+    document.addEventListener('mouseup', this.onResizeEnd);
+  }
+
+  onResize = (event: MouseEvent): void =>{
+    if (!this.isResizing) return;
+    const diffX = event.clientX - this.resizeStartX;
+    const scaleFactor = 1;
+    const newWidth = this.resizeStartWidth + (diffX / this.containerWidth * 100 * scaleFactor);
+    this.categoriesWidth = Math.max(20, Math.min(80, newWidth));
+  }
+
+  onResizeEnd = (): void => {
+    this.isResizing = false;
+    document.removeEventListener('mousemove', this.onResize);
+    document.removeEventListener('mouseup', this.onResizeEnd);
+  }
+
+
+  addCategory(): void {
+    const newCategory: Category = {
+      name: `Category ${this.categories.length + 1}`,
+      teams: []
+    }
+    this.categories.push(newCategory);
+  }
+
+  addTeam(category: Category): void {
+    const newTeam: Team = {
+      name: `Team ${category.teams.length + 1}`,
+      units: []
+    };
+    category.teams.push(newTeam);
+  }
+
+  removeTeam(category: Category, team: Team): void {
+    const index = category.teams.indexOf(team);
+    if (index !== -1) {
+      category.teams.splice(index, 1);
+    }
+  }
+
+  editTeamName(team: Team, newName: string): void {
+    team.name = newName;
+  }
+
+  addUnitToTeam(team: Team, unit: Unit): void {
+    if (team.units.length < 5 && !team.units.some(u => u.data.base_id === unit.data.base_id)) {
+      team.units.push(unit);
+      this.removeUnitFromUnassigned(unit);
+    }
+  }
+
+  removeUnitFromTeam(team: Team, unit: Unit): void {
+    const index = team.units.indexOf(unit);
+    if (index !== -1) {
+      team.units.splice(index, 1);
+      this.unassignedTeam.push(unit);
+      this.unassignedTeam.sort((a, b) => b.data.power - a.data.power);
+    }
+  }
+
+  private removeUnitFromUnassigned(unit: Unit): void {
+    const index = this.unassignedTeam.findIndex(u => u.data.base_id === unit.data.base_id);
+    if (index !== -1) {
+      this.unassignedTeam.splice(index, 1);
+    }
+  }
+
+  reorderUnitInTeam(team: Team, unit1: Unit, unit2: Unit): void {
+    const index1 = team.units.findIndex(u => u === unit1);
+    const index2 = team.units.findIndex(u => u === unit2);
+
+    if (index1 === -1 || index2 === -1 || index1 === index2) {
+      return; // Invalid units or no change needed
+    }
+
+    // Swap the positions of the two units
+    [team.units[index1], team.units[index2]] = [team.units[index2], team.units[index1]];
+  }
+
+  reorderTeamInCategory(category: Category, team: Team, direction: 'up' | 'down'): void {
+    const index = category.teams.indexOf(team);
+    if (index === -1) return; // Team not found in category
+
+    let newIndex: number;
+    if (direction === 'up') {
+      newIndex = Math.max(0, index - 1);
+    } else {
+      newIndex = Math.min(category.teams.length - 1, index + 1);
+    }
+
+    if (newIndex !== index) {
+      // Remove the team from its current position
+      category.teams.splice(index, 1);
+      // Insert the team at its new position
+      category.teams.splice(newIndex, 0, team);
+    }
+  }
+
+
 
   private async loadUserData(): Promise<void> {
     const user = await this.authService.getCurrentUser();
@@ -71,6 +210,9 @@ export class TeamPlannerComponent implements OnInit, AfterViewInit {
 
     this.unassignedTeam.sort((a, b) => b.data.power - a.data.power);
     this.filteredUnits = this.unassignedTeam;
+
+    this.categories[0].teams[0].units = this.unassignedTeam.slice(0, 3);
+
     this.loadNextBatch();
   }
 
