@@ -28,13 +28,38 @@
 .team-header {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-start;
 }
 
 .team-units {
     display: flex;
     gap: 8px;
     margin-top: 8px;
+    height: 130px; // Set a fixed height
+    align-items: stretch; // Stretch items to fill the container height
+}
+
+.team-unit,
+.empty-unit {
+    width: calc(20% - 6.4px);
+    height: 100%; // Take full height of the container
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; // Align items to the top
+}
+
+.empty-unit {
+    background-color: rgba(200, 200, 200, 0.1);
+    align-items: center; // Center the content vertically
+}
+
+.empty-unit-inner {
+    width: 60%;
+    height: 60%;
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+    border: 1px solid rgba(0, 0, 0, 0.3);
+    margin-top: 5px; // Add some margin at the top to align with characters
 }
 
 .character-selection {

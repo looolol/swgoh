@@ -106,7 +106,7 @@ export class TeamPlannerComponent implements OnInit, AfterViewInit {
     const diffX = event.clientX - this.resizeStartX;
     const scaleFactor = 1;
     const newWidth = this.resizeStartWidth + (diffX / this.containerWidth * 100 * scaleFactor);
-    this.categoriesWidth = Math.max(20, Math.min(80, newWidth));
+    this.categoriesWidth = Math.max(40, Math.min(75, newWidth));
   }
 
   onResizeEnd = (): void => {
@@ -211,7 +211,7 @@ export class TeamPlannerComponent implements OnInit, AfterViewInit {
     this.unassignedTeam.sort((a, b) => b.data.power - a.data.power);
     this.filteredUnits = this.unassignedTeam;
 
-    this.categories[0].teams[0].units = this.unassignedTeam.slice(0, 3);
+    this.categories[0].teams[0].units = this.unassignedTeam.slice(0, 5);
 
     this.loadNextBatch();
   }
