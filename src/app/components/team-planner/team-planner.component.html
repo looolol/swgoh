@@ -1,6 +1,6 @@
 <div #container class="team-planner-container" [class.resizing]="isResizing">
   <div class="categories-container" [style.width.%]="categoriesWidth">
-    <button mat-raised-button color="primary" (click)="addCategory()">Add Category</button>
+    <button mat-raised-button color="primary" (click)="addNewCategory()">Add Category</button>
 
     <mat-card *ngFor="let category of categories" class="category-card">
         <mat-card-header>
@@ -10,10 +10,10 @@
             <mat-card *ngFor="let team of category.teams" class="team-row" appearance="outlined">
                 <div class="team-header">
                     <h3>{{ team.name }}</h3>
-                    <button mat-icon-button (click)="editTeamName(team, team.name)">
+                    <button mat-icon-button (click)="editTeamName(team.name, team)">
                         <mat-icon>edit</mat-icon>
                     </button>
-                    <button mat-icon-button (click)="removeTeam(category, team)">
+                    <button mat-icon-button (click)="removeTeam(team, category)">
                         <mat-icon>delete</mat-icon>
                     </button>
                 </div>
@@ -28,7 +28,7 @@
                     </div>
                 </div>
             </mat-card>
-            <button mat-button (click)="addTeam(category)">Add Team</button>
+            <button mat-button (click)="addNewTeam(category)">Add Team</button>
         </mat-card-content>
     </mat-card>
   </div>

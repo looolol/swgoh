@@ -13,17 +13,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { CdkDragMove, DragDropModule } from '@angular/cdk/drag-drop';
-
-export interface Team {
-  name: string;
-  units: Unit[];
-}
-
-export interface Category {
-  name: string;
-  teams: Team[];
-}
+import { Category, Team } from '../../models/team.model';
+import { UnitService } from '../../services/unit/unit.service';
+import { TeamService } from '../../services/team/team.service';
 
 @Component({
   selector: 'app-team-planner',
@@ -39,8 +31,7 @@ export interface Category {
     MatButtonModule,
     MatInputModule,
     MatButtonModule,
-    MatIconModule,
-    DragDropModule
+    MatIconModule
   ],
   templateUrl: './team-planner.component.html',
   styleUrl: './team-planner.component.scss'
@@ -81,8 +72,11 @@ export class TeamPlannerComponent implements OnInit, AfterViewInit {
   constructor(
     private authService: AuthService,
     private userDataService: UserDataService,
-    private gameDataService: GameDataService
+    private gameDataService: GameDataService,
+    private teamService: TeamService,
+    private unitService: UnitService
   ) {}
+
 
   ngOnInit(): void {
     this.loadUserData();
@@ -91,6 +85,17 @@ export class TeamPlannerComponent implements OnInit, AfterViewInit {
   ngAfterViewInit(): void {
     this.characterScroll.nativeElement.addEventListener('scroll', this.onScroll.bind(this));
     this.containerWidth = this.container.nativeElement.offsetWidth;
+  }
+
+  onScroll(): void {
+    const element = this.characterScroll.nativeElement;
+    if (element.scrollHeight - element.scrollTop <= element.clientHeight + 100) {
+      this.loadNextBatch();
+    }
+  }
+
+  trackByBaseId(index: number, unit: Unit): string {
+    return unit.data.base_id;
   }
 
   onResizeStart(event: MouseEvent): void {
@@ -114,90 +119,6 @@ export class TeamPlannerComponent implements OnInit, AfterViewInit {
     document.removeEventListener('mousemove', this.onResize);
     document.removeEventListener('mouseup', this.onResizeEnd);
   }
-
-
-  addCategory(): void {
-    const newCategory: Category = {
-      name: `Category ${this.categories.length + 1}`,
-      teams: []
-    }
-    this.categories.push(newCategory);
-  }
-
-  addTeam(category: Category): void {
-    const newTeam: Team = {
-      name: `Team ${category.teams.length + 1}`,
-      units: []
-    };
-    category.teams.push(newTeam);
-  }
-
-  removeTeam(category: Category, team: Team): void {
-    const index = category.teams.indexOf(team);
-    if (index !== -1) {
-      category.teams.splice(index, 1);
-    }
-  }
-
-  editTeamName(team: Team, newName: string): void {
-    team.name = newName;
-  }
-
-  addUnitToTeam(team: Team, unit: Unit): void {
-    if (team.units.length < 5 && !team.units.some(u => u.data.base_id === unit.data.base_id)) {
-      team.units.push(unit);
-      this.removeUnitFromUnassigned(unit);
-    }
-  }
-
-  removeUnitFromTeam(team: Team, unit: Unit): void {
-    const index = team.units.indexOf(unit);
-    if (index !== -1) {
-      team.units.splice(index, 1);
-      this.unassignedTeam.push(unit);
-      this.unassignedTeam.sort((a, b) => b.data.power - a.data.power);
-    }
-  }
-
-  private removeUnitFromUnassigned(unit: Unit): void {
-    const index = this.unassignedTeam.findIndex(u => u.data.base_id === unit.data.base_id);
-    if (index !== -1) {
-      this.unassignedTeam.splice(index, 1);
-    }
-  }
-
-  reorderUnitInTeam(team: Team, unit1: Unit, unit2: Unit): void {
-    const index1 = team.units.findIndex(u => u === unit1);
-    const index2 = team.units.findIndex(u => u === unit2);
-
-    if (index1 === -1 || index2 === -1 || index1 === index2) {
-      return; // Invalid units or no change needed
-    }
-
-    // Swap the positions of the two units
-    [team.units[index1], team.units[index2]] = [team.units[index2], team.units[index1]];
-  }
-
-  reorderTeamInCategory(category: Category, team: Team, direction: 'up' | 'down'): void {
-    const index = category.teams.indexOf(team);
-    if (index === -1) return; // Team not found in category
-
-    let newIndex: number;
-    if (direction === 'up') {
-      newIndex = Math.max(0, index - 1);
-    } else {
-      newIndex = Math.min(category.teams.length - 1, index + 1);
-    }
-
-    if (newIndex !== index) {
-      // Remove the team from its current position
-      category.teams.splice(index, 1);
-      // Insert the team at its new position
-      category.teams.splice(newIndex, 0, team);
-    }
-  }
-
-
 
   private async loadUserData(): Promise<void> {
     const user = await this.authService.getCurrentUser();
@@ -229,106 +150,24 @@ export class TeamPlannerComponent implements OnInit, AfterViewInit {
   }
 
   onSearch(): void {
-    if (this.searchTerm.trim() === '') {
-      this.filteredUnits = this.unassignedTeam;
-    } else {
-      const searchTerms = this.searchTerm.toLowerCase().split(' ');
-      this.filteredUnits = this.unassignedTeam.filter(unit => {
-        const character = this.gameDataStore.characters.find(char => char.base_id === unit.data.base_id);
-        if (!character) return false;
-        
-        return searchTerms.every(term => {
-          if (term === 'ship') {
-            return character.ship;
-          }
-          if (term === 'noship') {
-            return !character.ship;
-          }
-
-          if (character.name.toLowerCase().includes(term)) return true;
-
-          // Check for tag match
-          if (character.categories.some(tag => tag.toLowerCase().includes(term))) return true;
-
-          // Check for alignment match
-          if (character.alignment.toLowerCase().includes(term)) return true;
-
-          // Check for role match
-          if (character.role && character.role.toLowerCase().includes(term)) return true;
-
-          // Check for ability class match
-          if (character.ability_classes.some(cls => cls.toLowerCase().includes(term))) return true;
-
-          // Check for gear tier match
-          // Check for 'relics' or 'nonrelic' terms
-          if (term === 'relic' || term === "relics" || term === "rl") {
-            return unit.data.gear_level >= 13; // G13 or higher (has relics)
-          }
-          if (term === 'nonrelic' || term === 'nonrelics' || term === "nr") {
-            return unit.data.gear_level < 13; // Less than G13 (no relics)
-          }
-
-          const gearMatch = term.match(/([<>=]?)g(\d+)/);
-          if (gearMatch) {
-            const [, operator, gearLevel] = gearMatch;
-            const unitGear = unit.data.gear_level;
-            switch (operator) {
-              case '<':
-                return unitGear < parseInt(gearLevel);
-              case '>':
-                return unitGear > parseInt(gearLevel);
-              case '=':
-              case '':
-                return unitGear === parseInt(gearLevel);
-            }
-          }
-
-          // Check for relic tier match
-          const relicMatch = term.match(/([<>=]?)r(\d+)/);
-          if (relicMatch) {
-            const [, operator, relicLevel] = relicMatch;
-            const unitRelic = unit.data.relic_tier - 2; // Adjust for game's relic tier representation
-            switch (operator) {
-              case '<':
-                return unitRelic < parseInt(relicLevel);
-              case '>':
-                return unitRelic > parseInt(relicLevel);
-              case '=':
-              case '':
-                return unitRelic === parseInt(relicLevel);
-            }
-          }
-
-          if (character.ship) {
-            // Check for ship class match (if it's a ship)
-            const ship = this.gameDataStore.ships.find(ship => ship.base_id === character.ship);
-            if (ship && ship.name.toLowerCase().includes(term)) {
-              return true;
-            }
-
-            // Check for capital ship match
-            if (term === 'capital' && ship && ship.capital_ship) {
-              return true;
-            }
-          }
-
-          return false;
-        });
-      });
-    }
-
+    this.filteredUnits = this.unitService.filterUnits(this.searchTerm, this.unassignedTeam, this.gameDataStore);
     this.displayedUnits = [];
     this.loadNextBatch();
   }
 
-  onScroll(): void {
-    const element = this.characterScroll.nativeElement;
-    if (element.scrollHeight - element.scrollTop <= element.clientHeight + 100) {
-      this.loadNextBatch();
-    }
+  addNewCategory(): void {
+    this.teamService.addNewCategory(this.categories);
   }
 
-  trackByBaseId(index: number, unit: Unit): string {
-    return unit.data.base_id;
+  addNewTeam(category: Category): void {
+    this.teamService.addNewTeam(category);
+  }
+
+  removeTeam(team: Team, category: Category): void {
+    this.teamService.removeTeam(team, category);
+  }
+
+  editTeamName(newName: string, team: Team): void {
+    this.teamService.editTeamName(newName, team);
   }
 }
