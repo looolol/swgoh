@@ -37,15 +37,13 @@ export class UnitListComponent {
       console.log("Unit List Drop Different Container\n", unit.userUnitData.data.name, event);
 
       unit.assigned = true;
+
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
         event.previousIndex,
         event.currentIndex,
       );
-
-      // Update the local units array
-      //this.units = [...this.units];
 
       this.teamUpdate.emit({
         type: TeamUpdateType.Move,
@@ -57,9 +55,6 @@ export class UnitListComponent {
     } else {
       console.log("Unit List Drop Same Container\n", (event.item.data as Unit).userUnitData.data.name, event);
       moveItemInArray(this.units, event.previousIndex, event.currentIndex);
-      
-      // Update the local units array
-      //this.units = [...this.units];
     }
   }
 

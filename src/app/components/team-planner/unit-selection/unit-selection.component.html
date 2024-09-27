@@ -3,7 +3,7 @@
     minBufferPx="800" maxBufferPx="1000" 
     cdkDropList [cdkDropListData]="filteredUnits" 
     (cdkDropListDropped)="onDrop($event)">
-  <div *cdkVirtualFor="let unit of filteredUnits" cdkDrag [cdkDragData]="unit">
+  <div *cdkVirtualFor="let unit of filteredUnits; trackBy: trackByUnitId" cdkDrag [cdkDragData]="unit">
     <app-character [unit]="unit"></app-character>
   </div>
 </cdk-virtual-scroll-viewport>

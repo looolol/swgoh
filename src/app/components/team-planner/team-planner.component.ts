@@ -7,9 +7,9 @@ import { TeamService } from '../../services/team/team.service';
 import { UnitService } from '../../services/unit/unit.service';
 import { AuthService } from '../../services/auth/auth.service';
 import { ImageLoadingService } from '../../services/image-loading/image-loading.service';
-import { Category, Team, Unit, TeamPlannerState } from '../../models/team.model';
-import { TeamUpdateEvent, TeamUpdateType } from '../../models/team-update-event.model';
-import { CdkDragDrop, DragDropModule, transferArrayItem } from '@angular/cdk/drag-drop';
+import { Unit, TeamPlannerState } from '../../models/team.model';
+import { TeamUpdateEvent } from '../../models/team-update-event.model';
+import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-team-planner',
@@ -84,21 +84,6 @@ export class TeamPlannerComponent implements OnInit {
   }
 
   private updateState(): void {
-    // Create a deep copy of the categories to trigger change detection
-    this.state.categories = JSON.parse(JSON.stringify(this.state.categories));
-    
-    // Update the unassigned units
-    this.state.units = this.state.units.filter(unit => !unit.assigned);
-    // Count the number of assigned units
-    const unassignedUnitsCount = this.state.units.filter(unit => !unit.assigned).length;
-    // Count the number of assigned units in all teams
-    const assignedUnitsInTeams = this.state.categories.reduce((total, category) => {
-      return total + category.teams.reduce((teamTotal, team) => {
-        return teamTotal + team.units.length;
-      }, 0);
-    }, 0);
-    console.log(`Total number of assigned units: ${unassignedUnitsCount}`);
-    console.log(`Total number of assigned units in teams: ${assignedUnitsInTeams}`);
   } 
 
   private preloadImages() {
@@ -118,22 +103,8 @@ export class TeamPlannerComponent implements OnInit {
   onDrop(event: CdkDragDrop<Unit[]>) {
     if (event.previousContainer !== event.container) {
       const unit = event.item.data as Unit;
-      console.log("Team Planner Drop", event, unit);
-      // const previousTeam = this.findTeamById(event.previousContainer.id);
-      // console.log("Previous Team", previousTeam);
-      // if (previousTeam) {
-      //   this.teamService.removeUnitFromTeam(unit, previousTeam);
-      //   // add to unassigned units
-      // }
+      //console.log("Team Planner Drop", event, unit);
     }
     this.updateState();
-  }
-
-  private findTeamById(teamId: string): Team | undefined {
-    return this.state.categories.flatMap(category => category.teams).find(team => team.id === teamId);
-  }
-
-  private findCategoryByTeamId(teamId: string): Category | undefined {
-    return this.state.categories.find(category => category.teams.some(team => team.id === teamId));
   }
 }

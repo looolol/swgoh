@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { UnitService } from '../../../services/unit/unit.service';
 import { TeamPlannerState, Unit } from '../../../models/team.model';
 import { CdkDragDrop, DragDropModule, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -20,7 +20,7 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
   templateUrl: './unit-selection.component.html',
   styleUrl: './unit-selection.component.scss'
 })
-export class UnitSelectionComponent implements OnInit {
+export class UnitSelectionComponent implements OnInit, OnChanges {
 
   @Input() state!: TeamPlannerState;
   @Input() isUnique: boolean = true;
@@ -35,10 +35,16 @@ export class UnitSelectionComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.initializeFilteredUnits();
+    this.updatedFilteredUnits();
   }
 
-  private initializeFilteredUnits() {
+  ngOnChanges(changes: SimpleChanges) {
+    if (changes['state'] || changes['filteredUnits']) {
+      this.updatedFilteredUnits();
+    }
+  }
+
+  private updatedFilteredUnits() {
     this.filteredUnits = this.sortUnitsByPower(this.state.units.filter(unit => !unit.assigned));
   }  
   
@@ -48,7 +54,7 @@ export class UnitSelectionComponent implements OnInit {
 
   onSearch() {
     if (this.searchTerm.trim() === '') {
-      this.initializeFilteredUnits();
+      this.updatedFilteredUnits();
     } else {
       this.filteredUnits = this.sortUnitsByPower(
         this.unitService.filterUnits(this.searchTerm, this.state.units.filter(unit => !unit.assigned))
@@ -62,6 +68,10 @@ export class UnitSelectionComponent implements OnInit {
     if (event.previousContainer !== event.container) {
       const unit = event.item.data as Unit;
       console.log("Unit Selection Drop\n", unit.userUnitData.data.name, event);
+
+      // Update the unit's assigneed status
+      unit.assigned = false;
+
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
@@ -69,13 +79,13 @@ export class UnitSelectionComponent implements OnInit {
         event.currentIndex,
       );
 
-      unit.assigned = false;
-      // Count the number of assigned units in state.units
-      const assignedUnitsCount = this.state.units.filter(u => u.assigned).length;
-      console.log(`Number of assigned units: ${assignedUnitsCount}`);
-      this.initializeFilteredUnits();
+      this.updatedFilteredUnits();
 
       this.drop.emit(event);
     }
+  }
+
+  trackByUnitId(index: number, unit: Unit): string {
+    return unit.id;
   }
 }
