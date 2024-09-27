@@ -5,6 +5,6 @@
         [isUnique]="isUnique" 
         (teamUpdate)="onTeamUpdate($event)">
     </app-team-list>
-    <button (click)="addTeam.emit(category.id)">Add Team</button>
+    <button (click)="addTeam.emit(category.id);">Add Team</button>
 </div>
-<button (click)="addCategory.emit()">Add Category</button>
+<button (click)="onAddCategory()">Add Category</button>

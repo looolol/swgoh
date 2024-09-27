@@ -1,10 +1,10 @@
-<div *ngIf="unit && character" class="character-container">
-    <div class="character-frame">
-      <img [src]="cachedImageSrc" [alt]="character.name" class="character-image" (load)="onImageLoad()" [class.loaded]="imageLoaded">
-      <img [src]="cachedGearFrameSrc" alt="Gear Frame" class="gear-frame" (load)="onImageLoad()" [class.loaded]="imageLoaded">
-    </div>
-    <div class="star-rating">
-      <img *ngFor="let star of stars" [src]="star.src" [ngClass]="star.class" alt="Star" class="star-image">
-    </div>
-    <p class="character-name">{{character.name}}</p>
+<div class="character-container">
+  <div class="character-frame">
+    <img [src]="characterImage$ | async" [alt]="unit.characterDefinition.name" class="character-image">
+    <img [src]="gearFrameUrl" alt="Gear Frame" class="gear-frame">
+  </div>
+  <div class="star-rating">
+    <img *ngFor="let star of stars" [src]="star.src" [ngClass]="star.class" alt="Star" class="star-image">
+  </div>
+  <p class="character-name">{{unit.characterDefinition.name}}</p>
 </div>

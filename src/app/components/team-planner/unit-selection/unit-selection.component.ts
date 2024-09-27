@@ -4,14 +4,18 @@ import { Unit } from '../../../models/team.model';
 import { CdkDragDrop, DragDropModule } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { CharacterComponent } from '../../shared/character/character.component';
+import { ScrollingModule } from '@angular/cdk/scrolling';
 
 @Component({
   selector: 'app-unit-selection',
   standalone: true,
   imports: [
     CommonModule,
+    CharacterComponent,
     FormsModule,
-    DragDropModule
+    DragDropModule,
+    ScrollingModule
   ],
   templateUrl: './unit-selection.component.html',
   styleUrl: './unit-selection.component.scss'
@@ -26,18 +30,33 @@ export class UnitSelectionComponent implements OnInit {
   searchTerm = '';
   filteredUnits: Unit[] = [];
 
-  constructor(private unitService: UnitService) {}
+  constructor(
+    private unitService: UnitService
+  ) {}
 
   ngOnInit() {
-    this.filteredUnits = this.units;
+    this.intializeFilteredUnits();
+  }
+
+  private sortUnitsByPower(units: Unit[]): Unit[] {
+    return units.sort((a, b) => b.userUnitData.data.power - a.userUnitData.data.power);
+  }
+
+  private intializeFilteredUnits() {
+    this.filteredUnits = this.sortUnitsByPower([...this.units]);
   }
 
   onSearch() {
-    this.filteredUnits = this.unitService.filterUnits(this.searchTerm, this.units);
+    if (this.searchTerm.trim() === '') {
+      this.intializeFilteredUnits();
+    } else {
+      this.filteredUnits = this.sortUnitsByPower(
+        this.unitService.filterUnits(this.searchTerm, this.units)
+      );
+    }
   }
 
   onDrop(event: CdkDragDrop<Unit[]>) {
     this.drop.emit(event);
   }
-
 }

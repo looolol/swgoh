@@ -1,0 +1,14 @@
+.unit-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 10px;
+}
+
+cdk-virtual-scroll-viewport {
+    height: 100%;
+    width: 100%;
+}
+
+.unit-item {
+    margin-bottom: 10px;
+}

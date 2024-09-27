@@ -24,6 +24,7 @@ export class UserDataService extends StoreService {
     return {
       user: await this.getUser(allyCode),
       units: await this.getUnits(allyCode),
+      ships: await this.getShips(allyCode),
       mods: await this.getMods(allyCode),
       datacrons: await this.getDatacrons(allyCode)
     };
@@ -34,7 +35,11 @@ export class UserDataService extends StoreService {
   }
 
   async getUnits(allyCode: number): Promise<UserUnitData[]> {
-    return this.fetchAndCacheData(`${allyCode}_units`, () => this.swgohApiService.getUnits(allyCode));
+    return await this.fetchAndCacheData(`${allyCode}_units`, () => this.swgohApiService.getUnits(allyCode));
+  }
+
+  async getShips(allyCode: number): Promise<UserUnitData[]> {
+    return await this.fetchAndCacheData(`${allyCode}_units`, () => this.swgohApiService.getUnits(allyCode));
   }
 
   async getMods(allyCode: number): Promise<Mod[]> {

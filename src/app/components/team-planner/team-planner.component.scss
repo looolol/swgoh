@@ -1,214 +1,23 @@
-.team-planner-container {
+.team-planner {
     display: flex;
-    height: calc(100vh - 64px); // Adjust this value based on your app's header height
-    overflow: hidden;
-    position: relative;
-
-    &:not(.resizing) {
-        .categories-container,
-        .character-selection {
-            transition: width 0.3s ease;
-        }
-    }
-}
-
-.categories-container {
-    overflow-y: auto;
-    padding: 16px;
-}
-
-.category-card {
-    margin-bottom: 16px;
-}
-
-.team-row {
-    margin-bottom: 8px;
-}
-
-.team-header {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-}
-
-.team-units {
-    display: flex;
-    gap: 8px;
-    margin-top: 8px;
-    height: 130px; // Set a fixed height
-    align-items: stretch; // Stretch items to fill the container height
-}
-
-.team-unit,
-.empty-unit {
-    width: calc(20% - 6.4px);
-    height: 100%; // Take full height of the container
-    display: flex;
-    justify-content: center;
-    align-items: flex-start; // Align items to the top
-}
-
-.empty-unit {
-    background-color: rgba(200, 200, 200, 0.1);
-    align-items: center; // Center the content vertically
-}
-
-.empty-unit-inner {
-    width: 60%;
-    height: 60%;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    border: 1px solid rgba(0, 0, 0, 0.3);
-    margin-top: 5px; // Add some margin at the top to align with characters
-}
-
-.character-selection {
-    flex: 1;
-    display: flex;
-    justify-content: flex-end;
+    height: calc(100vh - 64px); // Adjust based on your app's header height
     overflow: hidden;
 }
 
-.character-list {
-    flex: 1; // This will take up 25% of the width
-    display: flex;
-    flex-direction: column;
-    border-radius: 4px 0 0 4px;
-    box-shadow: -2px 0 4px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
-}
-
-.resize-handle {
-    width: 8px;
-    background-color: #ccc;
-    cursor: col-resize;
-
-    &:hover {
-        background-color: #999;
-    }
-
-    &:active {
-        background-color: #666;
-    }
-}
-
-mat-card-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.character-scroll {
+.team-planner-left,
+.team-planner-right {
     flex: 1;
     overflow-y: auto;
+    padding: 20px;
 }
 
-.character-grid {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    padding: 10px;
+.team-planner-left {
+    border-right: 1px solid #ccc;
 }
 
-.character-item {
-    flex: 0 0 calc(6.66% - 10px);
-    margin-bottom: 10px;
-    max-width: calc(6.66% - 10px);
-    min-width: 90px;
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-.search-bar {
-    width: calc(100% - 32px); // Adjust for padding
-    margin: 16px;
-    box-sizing: border-box;
-}
-
-.loading-spinner {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px 0;
-}
-
-// Responsive adjustments
-@media (max-width: 2400px) {
-    .character-item {
-        flex: 0 0 calc(6.25% - 10px);
-        max-width: calc(6.25% - 10px);
-    }
-}
-
-@media (max-width: 2100px) {
-    .character-item {
-        flex: 0 0 calc(7.69% - 10px);
-        max-width: calc(7.69% - 10px);
-    }
-}
-
-@media (max-width: 1800px) {
-    .character-item {
-        flex: 0 0 calc(10% - 10px);
-        max-width: calc(10% - 10px);
-    }
-}
-
-@media (max-width: 1500px) {
-    .character-item {
-        flex: 0 0 calc(12.5% - 10px);
-        max-width: calc(12.5% - 10px);
-    }
-}
-
-@media (max-width: 1200px) {
-    .character-item {
-        flex: 0 0 calc(16.66% - 10px);
-        max-width: calc(16.66% - 10px);
-    }
-}
-
-@media (max-width: 900px) {
-    .character-item {
-        flex: 0 0 calc(20% - 10px);
-        max-width: calc(20% - 10px);
-    }
-}
-
-@media (max-width: 600px) {
-    .character-item {
-        flex: 0 0 calc(25% - 10px);
-        max-width: calc(25% - 10px);
-    }
-}
-
-@media (max-width: 400px) {
-    .character-item {
-        flex: 0 0 calc(33.33% - 10px);
-        max-width: calc(33.33% - 10px);
-    }
-}
-
-.cdk-drag-preview {
-    box-sizing: border-box;
-    border-radius: 4px;
-    box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2),
-                0 8px 10px 1px rgba(0, 0, 0, 0.14),
-                0 3px 14px 2px rgba(0, 0, 0, 0.12);
-}
-
-.cdk-drag-placeholder {
-    opacity: 0;
-}
-
-.cdk-drag-animating {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-.character-grid.cdk-drop-list-dragging .character-item:not(.cdk-drag-placeholder) {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
-}
-
-.character-item {
-    transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
+.toggle-unique-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
 }

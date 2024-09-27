@@ -1,7 +1,7 @@
 <div cdkDropList class="unit-list">
     <div *ngFor="let unit of units; let i = index" cdkDrag class="unit-item">
       <div class="unit-content">
-        <app-character [unit]="unit.userUnitData"></app-character>
+        <app-character [unit]="unit"></app-character>
         <button (click)="removeUnit(unit)" class="remove-button">Remove</button>
       </div>
       <div class="drag-placeholder" *cdkDragPlaceholder></div>

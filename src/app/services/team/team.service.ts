@@ -9,7 +9,7 @@ export class TeamService {
 
   constructor() { }
 
-  private numCategories: number = 1;
+  private numCategories: number = 0;
 
   //-------------------------------------------------------------------------------------------------
   // Category methods

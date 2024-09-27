@@ -1,0 +1,28 @@
+.category-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+}
+
+.category {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 15px;
+}
+
+.category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.add-team-button {
+  margin-top: 10px;
+}
+
+.add-category-button {
+  margin-top: 20px;
+  align-self: flex-start;
+}

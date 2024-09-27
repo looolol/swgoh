@@ -12,6 +12,7 @@ import { User } from "./user-data/user.model";
 export type UserDataStore = {
   user: User;
   units: UserUnitData[];
+  ships: UserUnitData[];
   mods: Mod[];
   datacrons: Datacron[];
 }
@@ -28,6 +29,7 @@ export type GameDataStore = {
 export const InitUserDataStore: UserDataStore = {
   user: {} as User,
   units: [],
+  ships: [],
   mods: [],
   datacrons: [],
 }

@@ -1,0 +1,18 @@
+.team-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.team {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.team-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}

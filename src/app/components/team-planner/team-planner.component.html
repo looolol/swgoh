@@ -1,16 +1,20 @@
-<div cdkDropListGroup>
-  <app-category-list>
-    [categories]="state.categories"
-    [isUnique]="state.unique"
-    (addCategory)="addCategory()"
-    (addTeam)="addTeam($event)"
-    (teamUpdate)="onTeamUpdate($event)"
-  </app-category-list>
-  <app-unit-selection
-    [units]="state.unassignedUnits"
-    [isUnique]="state.isUnique"
-    (unitSelected)="onUnitSelect($event)">
-  </app-unit-selection>
-</div>
+<div cdkDropListGroup class="team-planner">
+  <div class="team-planner-left">
+    <app-category-list
+      [categories]="state.categories"
+      [isUnique]="state.isUnique"
+      (addCategory)="addCategory()"
+      (addTeam)="addTeam($event)"
+      (teamUpdate)="onTeamUpdate($event)">
+    </app-category-list>
+    <button (click)="toggleUnique()">Toggle Unique</button>
+  </div>
 
-<button (click)="toggleUnique()">Toggle Unique</button>
+  <div class="team-planner-right">
+    <app-unit-selection
+      [units]="state.units"
+      [isUnique]="state.isUnique"
+      (unitSelected)="onUnitSelect($event)">
+    </app-unit-selection>
+  </div>
+</div>

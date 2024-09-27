@@ -17,6 +17,7 @@ import { TeamUpdateEvent, TeamUpdateType } from '../../models/team-update-event.
 import { CategoryListComponent } from './category-list/category-list.component';
 import { TeamListComponent } from './team-list/team-list.component';
 import { UnitSelectionComponent } from './unit-selection/unit-selection.component';
+import { ImageLoadingService } from '../../services/image-loading/image-loading.service';
 
 @Component({
   selector: 'app-team-planner',
@@ -44,22 +45,22 @@ export class TeamPlannerComponent implements OnInit {
  
   state: TeamPlannerState = {
     categories: [],
-    allUnits: [],
-    unassignedUnits: [],
+    units: [],
     isUnique: true
   };
 
   constructor(
     private authService: AuthService,
     private teamService: TeamService,
-    private unitService: UnitService
+    private unitService: UnitService,
+    private imageLoadingService: ImageLoadingService
   ) {}
 
   async ngOnInit(): Promise<void>{
     const user = await this.authService.getCurrentUser();
     await this.unitService.loadStores(user.ally_code);
-    this.state.allUnits = this.unitService.getAllUnits();
-    this.state.unassignedUnits = [...this.state.allUnits];
+    this.unitService.initializeUnits(this.state.units);
+    this.preloadImages();
     this.addCategory();
     this.addTeam(this.state.categories[0].id);
   }
@@ -120,5 +121,13 @@ export class TeamPlannerComponent implements OnInit {
       );
     }
     // Update state after transfer
+  }
+
+  preloadImages() {
+    const imageUrls = this.state.units
+      .filter(unit => unit.userUnitData.data.combat_type === 1)
+      .map(unit => unit.characterDefinition.image);
+
+    this.imageLoadingService.preloadImages(imageUrls);
   }
 }

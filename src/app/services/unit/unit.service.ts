@@ -5,6 +5,7 @@ import { Unit } from '../../models/team.model';
 import { GameDataService } from '../game-data/game-data.service';
 import { UserDataService } from '../user-data/user-data.service';
 import { generateUniqueId } from '../../helper/common';
+import { Ship } from '../../models/game-data/ship.model';
 
 @Injectable({
   providedIn: 'root'
@@ -24,46 +25,42 @@ export class UnitService {
     this.gameDataStore = await this.gameDataService.getStore();
   }
 
-  getCharacterDefinition(unit: Unit): Character | undefined {
-    const character = this.gameDataStore.characters.find(character => 
-      character.base_id === unit.userUnitData.data.base_id
-    );
-    if (!character) {
-      console.warn(`Character not found for unit with base_id: ${unit.userUnitData.data.base_id}`);
-    }
-    return character;
+  private getCharacterDefinition(baseId: string): Character | undefined {
+    return this.gameDataStore.characters.find(character => character.base_id === baseId);
   }
 
-  getAllUnits(): Unit[] {
-    const allUnits: Unit[] = [];
-
+  initializeUnits(units: Unit[]): void {
     this.userDataStore.units.forEach(userUnit => {
-      allUnits.push({
+      if (userUnit.data.combat_type === 2) return;
+
+      const characterDefinition = this.getCharacterDefinition(userUnit.data.base_id);
+      if (!characterDefinition) return;
+
+      units.push({
         id: generateUniqueId(),
-        userUnitData: userUnit
+        assigned: false,
+        userUnitData: userUnit,
+        characterDefinition: characterDefinition
       })
     })
-
-    return allUnits;
   }
 
 
   filterUnits(searchTerm: string, units: Unit[]): Unit[] {
-
     if (searchTerm.trim() === '') {
       return units;
     }
 
     const searchTerms = searchTerm.toLowerCase().split(' ');
     return units.filter(unit => {
-      const character = this.getCharacterDefinition(unit);
-      if (!character) return false;
-
-      return searchTerms.every(term => this.matchesTerm(term, unit, character));
+      if (unit.userUnitData.data.combat_type !== 1) return false;
+      return searchTerms.every(term => this.matchesTerm(term, unit));
     });
   }
 
-  private matchesTerm(term: string, unit: Unit, character: Character): boolean {
+  private matchesTerm(term: string, unit: Unit): boolean {
+    const character = unit.characterDefinition;
+
     if (term === 'ship') {
       return !!character.ship;
     }

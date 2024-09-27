@@ -24,6 +24,15 @@ export class CategoryListComponent {
   @Output() teamUpdate = new EventEmitter<TeamUpdateEvent>();
   @Output() drop = new EventEmitter<CdkDragDrop<Unit[]>>();
 
+
+  onAddCategory(): void {
+    this.addCategory.emit();
+  } 
+
+  onAddTeam(categoryId: string): void {
+    this.addTeam.emit(categoryId);
+  }
+
   onTeamUpdate(event: TeamUpdateEvent): void {
     this.teamUpdate.emit(event);
   }
