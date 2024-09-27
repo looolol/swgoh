@@ -28,8 +28,15 @@ export class UnitListComponent {
   @Input() isUnique: boolean = true;
   @Output() teamUpdate = new EventEmitter<TeamUpdateEvent>();
 
+
+  // when dragged from unit-selection to unit-list
+  // or when dragged from unit-list to unit-list
   onDrop(event: CdkDragDrop<Unit[]>) {
     if (event.previousContainer !== event.container) {
+      const unit = event.item.data as Unit;
+      console.log("Unit List Drop Different Container\n", unit.userUnitData.data.name, event);
+
+      unit.assigned = true;
       transferArrayItem(
         event.previousContainer.data,
         event.container.data,
@@ -38,20 +45,21 @@ export class UnitListComponent {
       );
 
       // Update the local units array
-      this.units = [...this.units];
+      //this.units = [...this.units];
 
       this.teamUpdate.emit({
         type: TeamUpdateType.Move,
         category: this.category,
         team: this.team,
-        unit: event.item.data as Unit,
+        unit: unit,
         newIndex: event.currentIndex
       });
     } else {
+      console.log("Unit List Drop Same Container\n", (event.item.data as Unit).userUnitData.data.name, event);
       moveItemInArray(this.units, event.previousIndex, event.currentIndex);
       
       // Update the local units array
-      this.units = [...this.units];
+      //this.units = [...this.units];
     }
   }
 

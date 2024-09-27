@@ -61,17 +61,17 @@ export class TeamPlannerComponent implements OnInit {
   }
 
   onTeamUpdate(event: TeamUpdateEvent): void {
-    switch (event.type) {
-      case TeamUpdateType.Add:
-        this.teamService.addUnitToTeam(event.unit!, event.team);
-        break;
-      case TeamUpdateType.Remove:
-        this.teamService.removeUnitFromTeam(event.unit!, event.team);
-        break;
-      case TeamUpdateType.Move:
-        this.teamService.moveUnitInTeam(event.unit!, event.team, event.newIndex!);
-        break;
-    }
+    // switch (event.type) {
+    //   case TeamUpdateType.Add:
+    //     this.teamService.addUnitToTeam(event.unit!, event.team);
+    //     break;
+    //   case TeamUpdateType.Remove:
+    //     this.teamService.removeUnitFromTeam(event.unit!, event.team);
+    //     break;
+    //   case TeamUpdateType.Move:
+    //     this.teamService.moveUnitInTeam(event.unit!, event.team, event.newIndex!);
+    //     break;
+    // }
     this.updateState();
   }
 
@@ -89,7 +89,17 @@ export class TeamPlannerComponent implements OnInit {
     
     // Update the unassigned units
     this.state.units = this.state.units.filter(unit => !unit.assigned);
-  }
+    // Count the number of assigned units
+    const unassignedUnitsCount = this.state.units.filter(unit => !unit.assigned).length;
+    // Count the number of assigned units in all teams
+    const assignedUnitsInTeams = this.state.categories.reduce((total, category) => {
+      return total + category.teams.reduce((teamTotal, team) => {
+        return teamTotal + team.units.length;
+      }, 0);
+    }, 0);
+    console.log(`Total number of assigned units: ${unassignedUnitsCount}`);
+    console.log(`Total number of assigned units in teams: ${assignedUnitsInTeams}`);
+  } 
 
   private preloadImages() {
     const imageUrls = this.state.units
@@ -99,24 +109,22 @@ export class TeamPlannerComponent implements OnInit {
     this.imageLoadingService.preloadImages(imageUrls);
   }
 
+  
+  // emitted from unit-selection
+  // so when dragged from team -> unit
+  // what needs to happen?
+  // 1. remove unit from team
+  // 2. add unit to unassigned
   onDrop(event: CdkDragDrop<Unit[]>) {
     if (event.previousContainer !== event.container) {
       const unit = event.item.data as Unit;
-      const targetTeam = this.findTeamById(event.container.id);
-      if (targetTeam) {
-        transferArrayItem(
-          event.previousContainer.data,
-          event.container.data,
-          event.previousIndex,
-          event.currentIndex
-        );
-        this.onTeamUpdate({
-          type: TeamUpdateType.Add,
-          category: this.findCategoryByTeamId(targetTeam.id)!,
-          team: targetTeam,
-          unit: unit
-        });
-      }
+      console.log("Team Planner Drop", event, unit);
+      // const previousTeam = this.findTeamById(event.previousContainer.id);
+      // console.log("Previous Team", previousTeam);
+      // if (previousTeam) {
+      //   this.teamService.removeUnitFromTeam(unit, previousTeam);
+      //   // add to unassigned units
+      // }
     }
     this.updateState();
   }

@@ -12,7 +12,7 @@
 
   <div class="team-planner-right">
     <app-unit-selection
-      [units]="state.units"
+      [state]="state"
       [isUnique]="state.isUnique"
       (unitSelected)="onUnitSelect($event)"
       (drop)="onDrop($event)">
