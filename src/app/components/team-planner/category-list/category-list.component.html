@@ -1,0 +1,10 @@
+<div *ngFor="let category of categories">
+    <h2>{{ category.name }}</h2>
+    <app-team-list 
+        [teams]="category.teams" 
+        [isUnique]="isUnique" 
+        (teamUpdate)="onTeamUpdate($event)">
+    </app-team-list>
+    <button (click)="addTeam.emit(category.id)">Add Team</button>
+</div>
+<button (click)="addCategory.emit()">Add Category</button>

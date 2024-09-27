@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { Unit } from '../../../models/user-data/unit.model';
+import { UserUnitData } from '../../../models/user-data/unit-user-data.model';
 import { Character } from '../../../models/game-data/character.model';
 import { CommonModule } from '@angular/common';
 
@@ -13,7 +13,7 @@ import { CommonModule } from '@angular/common';
   styleUrl: './character.component.scss'
 })
 export class CharacterComponent implements OnInit {
-  @Input() unit!: Unit;
+  @Input() unit!: UserUnitData;
   @Input() characters: Character[] = [];
 
   character: Character | undefined;

@@ -10,7 +10,7 @@ import { Ship } from '../../models/game-data/ship.model';
 import { Ability } from '../../models/game-data/ability.model';
 import { DatacronSet } from '../../models/game-data/datacron-sets.model';
 import { Stat } from '../../models/game-data/stat.model';
-import { Unit } from '../../models/user-data/unit.model';
+import { UserUnitData } from '../../models/user-data/unit-user-data.model';
 import { Mod } from '../../models/user-data/mod.model';
 
 interface CacheItem {
@@ -88,7 +88,7 @@ export class SwgohApiService {
     return playerProfile.data;
   }
 
-  async getUnits(allyCode: number): Promise<Unit[]> {
+  async getUnits(allyCode: number): Promise<UserUnitData[]> {
     const playerProfile = await this.sendRequest(`${this.baseUrl}/player/${allyCode}/`);
     return playerProfile.units;
   }

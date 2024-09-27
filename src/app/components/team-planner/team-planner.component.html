@@ -1,62 +1,16 @@
-<div #container class="team-planner-container" [class.resizing]="isResizing">
-  <div class="categories-container" [style.width.%]="categoriesWidth">
-    <button mat-raised-button color="primary" (click)="addNewCategory()">Add Category</button>
-
-    <mat-card *ngFor="let category of categories" class="category-card">
-        <mat-card-header>
-            <mat-card-title>{{ category.name }}</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-            <mat-card *ngFor="let team of category.teams" class="team-row" appearance="outlined">
-                <div class="team-header">
-                    <h3>{{ team.name }}</h3>
-                    <button mat-icon-button (click)="editTeamName(team.name, team)">
-                        <mat-icon>edit</mat-icon>
-                    </button>
-                    <button mat-icon-button (click)="removeTeam(team, category)">
-                        <mat-icon>delete</mat-icon>
-                    </button>
-                </div>
-                <div class="team-units">
-                    <app-character 
-                        *ngFor="let unit of team.units" class="team-unit" 
-                        [unit]="unit" 
-                        [characters]="gameDataStore.characters">
-                    </app-character>
-                    <div *ngFor="let empty of [].constructor(5 - team.units.length)" class="empty-unit">
-                        <div class="empty-unit-inner"></div>
-                    </div>
-                </div>
-            </mat-card>
-            <button mat-button (click)="addNewTeam(category)">Add Team</button>
-        </mat-card-content>
-    </mat-card>
-  </div>
-
-  <div class="resize-handle" (mousedown)="onResizeStart($event)"></div>
-  
-  <div class="character-selection" [style.width.%]="100 - categoriesWidth">
-  <mat-card class="character-list">
-    <mat-card-header>
-      <mat-card-title>All Characters</mat-card-title>
-    </mat-card-header>
-
-    <mat-card-content>
-      <mat-form-field class="search-bar">
-        <input matInput placeholder="Search characters" [(ngModel)]="searchTerm" (ngModelChange)="onSearch()">
-      </mat-form-field>
-      <div #characterScroll class="character-scroll">
-        <div class="character-grid">
-          <div *ngFor="let unit of displayedUnits; trackBy: trackByBaseId" class="character-item">
-            <app-character [unit]="unit" [characters]="gameDataStore.characters"></app-character>
-          </div>
-        </div>
-        <div class="loading-spinner" *ngIf="isLoading">
-          <mat-spinner diameter="40"></mat-spinner>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  </div>
-
+<div cdkDropListGroup>
+  <app-category-list>
+    [categories]="state.categories"
+    [isUnique]="state.unique"
+    (addCategory)="addCategory()"
+    (addTeam)="addTeam($event)"
+    (teamUpdate)="onTeamUpdate($event)"
+  </app-category-list>
+  <app-unit-selection
+    [units]="state.unassignedUnits"
+    [isUnique]="state.isUnique"
+    (unitSelected)="onUnitSelect($event)">
+  </app-unit-selection>
 </div>
+
+<button (click)="toggleUnique()">Toggle Unique</button>

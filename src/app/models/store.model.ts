@@ -6,12 +6,12 @@ import { Gear } from "./game-data/gear.model";
 import { Mod } from "./user-data/mod.model";
 import { Ship } from "./game-data/ship.model";
 import { Stat } from "./game-data/stat.model";
-import { Unit } from "./user-data/unit.model";
+import { UserUnitData } from "./user-data/unit-user-data.model";
 import { User } from "./user-data/user.model";
 
 export type UserDataStore = {
   user: User;
-  units: Unit[];
+  units: UserUnitData[];
   mods: Mod[];
   datacrons: Datacron[];
 }

@@ -1,0 +1,10 @@
+<div *ngFor="let team of teams">
+    <h3>{{ team.name }}</h3>
+    <app-unit-list 
+        [units]="team.units" 
+        [isUnique]="isUnique"
+        [team]="team"
+        [category]="category"
+        (teamUpdate)="onTeamUpdate($event)">
+    </app-unit-list>
+</div>

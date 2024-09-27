@@ -1,12 +1,25 @@
-import { Unit } from "./user-data/unit.model";
+import { UserUnitData } from "./user-data/unit-user-data.model";
+
+export interface TeamPlannerState {
+  categories: Category[];
+  allUnits: Unit[];
+  unassignedUnits: Unit[];
+  isUnique: boolean;
+}
+
+export interface Category {
+  id: string;
+  name: string;
+  teams: Team[];
+}
 
 export interface Team {
-    name: string;
-    units: Unit[];
-  }
-  
-  export interface Category {
-    name: string;
-    teams: Team[];
-  }
-  
+  id: string;
+  name: string;
+  units: Unit[];
+}
+
+export interface Unit {
+  id: string;
+  userUnitData: UserUnitData;
+}

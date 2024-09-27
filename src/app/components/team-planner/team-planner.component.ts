@@ -1,9 +1,5 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../services/auth/auth.service';
-import { UserDataService } from '../../services/user-data/user-data.service';
-import { GameDataStore, InitGameDataStore, InitUserDataStore, UserDataStore } from '../../models/store.model';
-import { GameDataService } from '../../services/game-data/game-data.service';
-import { Unit } from '../../models/user-data/unit.model';
 import { CommonModule } from '@angular/common';
 import { CharacterComponent } from '../shared/character/character.component';
 import { MatCardModule } from '@angular/material/card';
@@ -13,9 +9,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
-import { Category, Team } from '../../models/team.model';
+import { TeamPlannerState, Unit } from '../../models/team.model';
 import { UnitService } from '../../services/unit/unit.service';
 import { TeamService } from '../../services/team/team.service';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { TeamUpdateEvent, TeamUpdateType } from '../../models/team-update-event.model';
+import { CategoryListComponent } from './category-list/category-list.component';
+import { TeamListComponent } from './team-list/team-list.component';
+import { UnitSelectionComponent } from './unit-selection/unit-selection.component';
 
 @Component({
   selector: 'app-team-planner',
@@ -23,6 +24,9 @@ import { TeamService } from '../../services/team/team.service';
   imports: [
     CommonModule,
     CharacterComponent,
+    CategoryListComponent,
+    TeamListComponent,
+    UnitSelectionComponent,
     MatCardModule,
     MatProgressSpinnerModule,
     MatInputModule,
@@ -36,138 +40,85 @@ import { TeamService } from '../../services/team/team.service';
   templateUrl: './team-planner.component.html',
   styleUrl: './team-planner.component.scss'
 })
-export class TeamPlannerComponent implements OnInit, AfterViewInit {
-  @ViewChild('characterScroll') characterScroll!: ElementRef;
-  @ViewChild('container') container!: ElementRef;
-
-  userDataStore: UserDataStore = InitUserDataStore;
-  gameDataStore: GameDataStore = InitGameDataStore;
-
-  categories: Category[] = [
-    {
-      name: 'Category 1',
-      teams: [
-        {
-          name: 'Team 1',
-          units: []
-        }
-      ]
-    }
-  ];
-
-  unassignedTeam: Unit[] = [];
-  displayedUnits: Unit[] = [];
-  filteredUnits: Unit[] = [];
-
-  batchSize = 50;
-  isLoading = false;
-  searchTerm = '';
-
-  isResizing: boolean = false;
-  resizeStartX: number = 0;
-  resizeStartWidth: number = 0;
-  containerWidth: number = 0;
-  categoriesWidth: number = 50; // 50% of the screen width
+export class TeamPlannerComponent implements OnInit {
+ 
+  state: TeamPlannerState = {
+    categories: [],
+    allUnits: [],
+    unassignedUnits: [],
+    isUnique: true
+  };
 
   constructor(
     private authService: AuthService,
-    private userDataService: UserDataService,
-    private gameDataService: GameDataService,
     private teamService: TeamService,
     private unitService: UnitService
   ) {}
 
-
-  ngOnInit(): void {
-    this.loadUserData();
-  }
-
-  ngAfterViewInit(): void {
-    this.characterScroll.nativeElement.addEventListener('scroll', this.onScroll.bind(this));
-    this.containerWidth = this.container.nativeElement.offsetWidth;
-  }
-
-  onScroll(): void {
-    const element = this.characterScroll.nativeElement;
-    if (element.scrollHeight - element.scrollTop <= element.clientHeight + 100) {
-      this.loadNextBatch();
-    }
-  }
-
-  trackByBaseId(index: number, unit: Unit): string {
-    return unit.data.base_id;
-  }
-
-  onResizeStart(event: MouseEvent): void {
-    this.isResizing = true;
-    this.resizeStartX = event.clientX;
-    this.resizeStartWidth = this.categoriesWidth;
-    document.addEventListener('mousemove', this.onResize);
-    document.addEventListener('mouseup', this.onResizeEnd);
-  }
-
-  onResize = (event: MouseEvent): void =>{
-    if (!this.isResizing) return;
-    const diffX = event.clientX - this.resizeStartX;
-    const scaleFactor = 1;
-    const newWidth = this.resizeStartWidth + (diffX / this.containerWidth * 100 * scaleFactor);
-    this.categoriesWidth = Math.max(40, Math.min(75, newWidth));
-  }
-
-  onResizeEnd = (): void => {
-    this.isResizing = false;
-    document.removeEventListener('mousemove', this.onResize);
-    document.removeEventListener('mouseup', this.onResizeEnd);
-  }
-
-  private async loadUserData(): Promise<void> {
+  async ngOnInit(): Promise<void>{
     const user = await this.authService.getCurrentUser();
-    this.userDataStore = await this.userDataService.getStore(user.ally_code);
-    this.gameDataStore = await this.gameDataService.getStore();
-
-    this.unassignedTeam = this.userDataStore.units.filter(unit => 
-      this.gameDataStore.characters.some(char => char.base_id === unit.data.base_id)
-    );
-
-    this.unassignedTeam.sort((a, b) => b.data.power - a.data.power);
-    this.filteredUnits = this.unassignedTeam;
-
-    this.categories[0].teams[0].units = this.unassignedTeam.slice(0, 5);
-
-    this.loadNextBatch();
+    await this.unitService.loadStores(user.ally_code);
+    this.state.allUnits = this.unitService.getAllUnits();
+    this.state.unassignedUnits = [...this.state.allUnits];
+    this.addCategory();
+    this.addTeam(this.state.categories[0].id);
   }
 
-  loadNextBatch(): void {
-    if (this.isLoading || this.displayedUnits.length >= this.filteredUnits.length) {
-      return;
+  addCategory(): void {
+    const newCategory = this.teamService.createNewCategory();
+    this.state.categories.push(newCategory);
+  }
+
+  addTeam(categoryId: string): void {
+    const category = this.state.categories.find(c => c.id === categoryId);
+    if (category) {
+      const newTeam = this.teamService.createNewTeam();
+      category.teams.push(newTeam);
     }
-
-    this.isLoading = true;
-    const start = this.displayedUnits.length;
-    const end = Math.min(start + this.batchSize, this.filteredUnits.length);
-    this.displayedUnits = [...this.displayedUnits, ...this.filteredUnits.slice(start, end)];
-    this.isLoading = false;
   }
 
-  onSearch(): void {
-    this.filteredUnits = this.unitService.filterUnits(this.searchTerm, this.unassignedTeam, this.gameDataStore);
-    this.displayedUnits = [];
-    this.loadNextBatch();
+  onTeamUpdate(event: TeamUpdateEvent): void {
+    switch (event.type) {
+      case TeamUpdateType.Add:
+        this.teamService.addUnitToTeam(event.unit!, event.team);
+        break;
+      case TeamUpdateType.Remove:
+        this.teamService.removeUnitFromTeam(event.unit!, event.team);
+        break;
+      case TeamUpdateType.Move:
+        this.teamService.moveUnitInTeam(event.unit!, event.team, event.newIndex!);
+        break;
+      case TeamUpdateType.Rename:
+        this.teamService.renameTeam(event.newName!, event.team);
+        break;  
+    }
+    this.updateState();
   }
 
-  addNewCategory(): void {
-    this.teamService.addNewCategory(this.categories);
+  private updateState(): void {
+    // Update state based on the changes made
+    // This might involve recalculating unassigned units
   }
 
-  addNewTeam(category: Category): void {
-    this.teamService.addNewTeam(category);
+  onUnitSelect(unit: Unit) {
+    //Handle unit selection, possibly opening a dialog to choose which team to add it to
   }
 
-  removeTeam(team: Team, category: Category): void {
-    this.teamService.removeTeam(team, category);
+  toggleUnique() {
+    this.state.isUnique = !this.state.isUnique;
   }
 
-  editTeamName(newName: string, team: Team): void {
-    this.teamService.editTeamName(newName, team);
+  onDrop(event: CdkDragDrop<Unit[]>) {
+    if (event.previousContainer === event.container) {
+      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+    } else {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
+      );
+    }
+    // Update state after transfer
   }
 }

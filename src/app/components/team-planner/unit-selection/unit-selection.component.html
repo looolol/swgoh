@@ -1,0 +1,6 @@
+<input [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" placeholder="Search units...">
+<div cdkDropList [cdkDropListData]="filteredUnits" (cdkDropListDropped)="onDrop($event)">
+    <div *ngFor="let unit of filteredUnits" >
+        {{ unit.userUnitData.data.name }}
+    </div>
+</div>

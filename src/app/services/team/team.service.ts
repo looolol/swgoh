@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Category, Team } from '../../models/team.model';
-import { Unit } from '../../models/user-data/unit.model';
+import { Category, Team, Unit } from '../../models/team.model';
+import { generateUniqueId } from '../../helper/common';
 
 @Injectable({
   providedIn: 'root'
@@ -9,25 +9,26 @@ export class TeamService {
 
   constructor() { }
 
+  private numCategories: number = 1;
+
   //-------------------------------------------------------------------------------------------------
   // Category methods
   //-------------------------------------------------------------------------------------------------
 
-  addCategory(category: Category, categories: Category[]): void {
-    categories.push(category);
-  }
+  createNewCategory(): Category {
+    this.numCategories++;
 
-  addNewCategory(categories: Category[]): void {
-    const newCategory: Category = {
-      name: `Category ${categories.length + 1}`,
+    return {
+      id: generateUniqueId(),
+      name: `Category ${this.numCategories}`,
       teams: []
     };
-    categories.push(newCategory);
   }
 
   removeCategory(category: Category, categories: Category[]): void {
     const index = categories.indexOf(category);
     categories.splice(index, 1);
+    this.numCategories--;
   }
 
   //-------------------------------------------------------------------------------------------------
@@ -38,12 +39,12 @@ export class TeamService {
     category.teams.push(team);
   }
 
-  addNewTeam(category: Category): void {
-    const newTeam: Team = {
-      name: `Team ${category.teams.length + 1}`,
+  createNewTeam(): Team {
+    return {
+      id: generateUniqueId(),
+      name: `New Team`,
       units: []
     };
-    category.teams.push(newTeam);
   }
 
   removeTeam(team: Team, category: Category): void {
@@ -51,8 +52,16 @@ export class TeamService {
     category.teams.splice(index, 1);
   }
 
-  editTeamName(newName: string, team: Team): void {
+  renameTeam(newName: string, team: Team): void {
     team.name = newName;
+  }
+
+  moveUnitInTeam(unit: Unit, team: Team, newIndex: number): void {
+    const index = team.units.indexOf(unit);
+    if (index !== -1) {
+      team.units.splice(index, 1);
+      team.units.splice(newIndex, 0, unit);
+    }
   }
 
   //-------------------------------------------------------------------------------------------------
@@ -60,7 +69,7 @@ export class TeamService {
   //-------------------------------------------------------------------------------------------------
 
   addUnitToTeam(unit: Unit, team: Team): void {
-    if (team.units.length < 5 && !team.units.some(u => u.data.base_id === unit.data.base_id)) {
+    if (team.units.length < 5 && !team.units.some(u => u.id === unit.id)) {
       team.units.push(unit);
     }
   }
