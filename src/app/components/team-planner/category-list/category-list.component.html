@@ -1,10 +1,13 @@
-<div *ngFor="let category of categories">
-    <h2>{{ category.name }}</h2>
-    <app-team-list 
-        [teams]="category.teams" 
-        [isUnique]="isUnique" 
-        (teamUpdate)="onTeamUpdate($event)">
-    </app-team-list>
-    <button (click)="addTeam.emit(category.id);">Add Team</button>
+<div class="category-list">
+    <div *ngFor="let category of categories" class="category">
+        <h2>{{ category.name }}</h2>
+        <app-team-list 
+            [teams]="category.teams" 
+            [isUnique]="isUnique" 
+            [category]="category"
+            (teamUpdate)="onTeamUpdate($event)">
+        </app-team-list>
+        <button mat-raised-button color="primary" (click)="addTeam.emit(category.id)">Add Team</button>
+    </div>
+    <button mat-raised-button color="accent" (click)="onAddCategory()">Add Category</button>
 </div>
-<button (click)="onAddCategory()">Add Category</button>

@@ -7,14 +7,15 @@
       (addTeam)="addTeam($event)"
       (teamUpdate)="onTeamUpdate($event)">
     </app-category-list>
-    <button (click)="toggleUnique()">Toggle Unique</button>
+    <button mat-raised-button color="primary" (click)="toggleUnique()">Toggle Unique</button>
   </div>
 
   <div class="team-planner-right">
     <app-unit-selection
       [units]="state.units"
       [isUnique]="state.isUnique"
-      (unitSelected)="onUnitSelect($event)">
+      (unitSelected)="onUnitSelect($event)"
+      (drop)="onDrop($event)">
     </app-unit-selection>
   </div>
 </div>

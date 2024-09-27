@@ -3,14 +3,19 @@ import { CharacterComponent } from '../../shared/character/character.component';
 import { CommonModule } from '@angular/common';
 import { Category, Team, Unit } from '../../../models/team.model';
 import { TeamUpdateEvent, TeamUpdateType } from '../../../models/team-update-event.model';
-import { CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'app-unit-list',
   standalone: true,
   imports: [
     CommonModule,
-    CharacterComponent
+    CharacterComponent,
+    DragDropModule,
+    MatIconModule,
+    MatButtonModule
   ],
   templateUrl: './unit-list.component.html',
   styleUrl: './unit-list.component.scss'
@@ -23,18 +28,31 @@ export class UnitListComponent {
   @Input() isUnique: boolean = true;
   @Output() teamUpdate = new EventEmitter<TeamUpdateEvent>();
 
-  moveUnit(unit: Unit, newIndex: number): void {
-    this.teamUpdate.emit({
-      type: TeamUpdateType.Move,
-      category: this.category,
-      team: this.team,
-      unit: unit,
-      newIndex: newIndex
-    })
-  }
-
   onDrop(event: CdkDragDrop<Unit[]>) {
-    moveItemInArray(this.units, event.previousIndex, event.currentIndex);
+    if (event.previousContainer !== event.container) {
+      transferArrayItem(
+        event.previousContainer.data,
+        event.container.data,
+        event.previousIndex,
+        event.currentIndex,
+      );
+
+      // Update the local units array
+      this.units = [...this.units];
+
+      this.teamUpdate.emit({
+        type: TeamUpdateType.Move,
+        category: this.category,
+        team: this.team,
+        unit: event.item.data as Unit,
+        newIndex: event.currentIndex
+      });
+    } else {
+      moveItemInArray(this.units, event.previousIndex, event.currentIndex);
+      
+      // Update the local units array
+      this.units = [...this.units];
+    }
   }
 
   removeUnit(unit: Unit) {
@@ -43,7 +61,6 @@ export class UnitListComponent {
       category: this.category,
       team: this.team,
       unit: unit
-    })
+    });
   }
-
 }

@@ -2,14 +2,16 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { Category, Team, Unit } from '../../../models/team.model';
 import { CommonModule } from '@angular/common';
 import { UnitListComponent } from '../unit-list/unit-list.component';
-import { TeamUpdateEvent, TeamUpdateType, UnitUpdateEvent } from '../../../models/team-update-event.model';
+import { TeamUpdateEvent } from '../../../models/team-update-event.model';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-team-list',
   standalone: true,
   imports: [
     CommonModule,
-    UnitListComponent
+    UnitListComponent,
+    DragDropModule
   ],
   templateUrl: './team-list.component.html',
   styleUrl: './team-list.component.scss'

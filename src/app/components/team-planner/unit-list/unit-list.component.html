@@ -1,9 +1,19 @@
-<div cdkDropList class="unit-list">
-    <div *ngFor="let unit of units; let i = index" cdkDrag class="unit-item">
-      <div class="unit-content">
+<div cdkDropList
+     [id]="'unit-list-' + team.id"
+     [cdkDropListData]="units"
+     (cdkDropListDropped)="onDrop($event)"
+     class="unit-list">
+
+    <div *ngFor="let unit of units" cdkDrag [cdkDragData]="unit" class="unit-item">
+    <div class="unit-content">
         <app-character [unit]="unit"></app-character>
-        <button (click)="removeUnit(unit)" class="remove-button">Remove</button>
-      </div>
-      <div class="drag-placeholder" *cdkDragPlaceholder></div>
+        <button mat-icon-button (click)="removeUnit(unit)" class="remove-button">
+        <mat-icon>close</mat-icon>
+        </button>
+    </div>
+    <div class="drag-placeholder" *cdkDragPlaceholder></div>
+    </div>
+    <div *ngIf="units.length === 0" class="empty-list">
+    Drag and drop units here
     </div>
 </div>

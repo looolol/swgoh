@@ -1,48 +1,30 @@
 import { Component, OnInit } from '@angular/core';
-import { AuthService } from '../../services/auth/auth.service';
 import { CommonModule } from '@angular/common';
-import { CharacterComponent } from '../shared/character/character.component';
-import { MatCardModule } from '@angular/material/card';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { TeamPlannerState, Unit } from '../../models/team.model';
-import { UnitService } from '../../services/unit/unit.service';
-import { TeamService } from '../../services/team/team.service';
-import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { TeamUpdateEvent, TeamUpdateType } from '../../models/team-update-event.model';
 import { CategoryListComponent } from './category-list/category-list.component';
-import { TeamListComponent } from './team-list/team-list.component';
 import { UnitSelectionComponent } from './unit-selection/unit-selection.component';
+import { MatButtonModule } from '@angular/material/button';
+import { TeamService } from '../../services/team/team.service';
+import { UnitService } from '../../services/unit/unit.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { ImageLoadingService } from '../../services/image-loading/image-loading.service';
+import { Category, Team, Unit, TeamPlannerState } from '../../models/team.model';
+import { TeamUpdateEvent, TeamUpdateType } from '../../models/team-update-event.model';
+import { CdkDragDrop, DragDropModule, transferArrayItem } from '@angular/cdk/drag-drop';
 
 @Component({
   selector: 'app-team-planner',
   standalone: true,
   imports: [
     CommonModule,
-    CharacterComponent,
     CategoryListComponent,
-    TeamListComponent,
     UnitSelectionComponent,
-    MatCardModule,
-    MatProgressSpinnerModule,
-    MatInputModule,
-    MatFormFieldModule,
-    FormsModule,
     MatButtonModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule
+    DragDropModule
   ],
   templateUrl: './team-planner.component.html',
   styleUrl: './team-planner.component.scss'
 })
 export class TeamPlannerComponent implements OnInit {
- 
   state: TeamPlannerState = {
     categories: [],
     units: [],
@@ -56,7 +38,7 @@ export class TeamPlannerComponent implements OnInit {
     private imageLoadingService: ImageLoadingService
   ) {}
 
-  async ngOnInit(): Promise<void>{
+  async ngOnInit(): Promise<void> {
     const user = await this.authService.getCurrentUser();
     await this.unitService.loadStores(user.ally_code);
     this.unitService.initializeUnits(this.state.units);
@@ -89,45 +71,61 @@ export class TeamPlannerComponent implements OnInit {
       case TeamUpdateType.Move:
         this.teamService.moveUnitInTeam(event.unit!, event.team, event.newIndex!);
         break;
-      case TeamUpdateType.Rename:
-        this.teamService.renameTeam(event.newName!, event.team);
-        break;  
     }
     this.updateState();
-  }
-
-  private updateState(): void {
-    // Update state based on the changes made
-    // This might involve recalculating unassigned units
-  }
-
-  onUnitSelect(unit: Unit) {
-    //Handle unit selection, possibly opening a dialog to choose which team to add it to
   }
 
   toggleUnique() {
     this.state.isUnique = !this.state.isUnique;
   }
 
-  onDrop(event: CdkDragDrop<Unit[]>) {
-    if (event.previousContainer === event.container) {
-      moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
-    } else {
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex,
-      );
-    }
-    // Update state after transfer
+  onUnitSelect(unit: Unit) {
+    // Handle unit selection, possibly opening a dialog to choose which team to add it to
   }
 
-  preloadImages() {
+  private updateState(): void {
+    // Create a deep copy of the categories to trigger change detection
+    this.state.categories = JSON.parse(JSON.stringify(this.state.categories));
+    
+    // Update the unassigned units
+    this.state.units = this.state.units.filter(unit => !unit.assigned);
+  }
+
+  private preloadImages() {
     const imageUrls = this.state.units
       .filter(unit => unit.userUnitData.data.combat_type === 1)
       .map(unit => unit.characterDefinition.image);
 
     this.imageLoadingService.preloadImages(imageUrls);
+  }
+
+  onDrop(event: CdkDragDrop<Unit[]>) {
+    if (event.previousContainer !== event.container) {
+      const unit = event.item.data as Unit;
+      const targetTeam = this.findTeamById(event.container.id);
+      if (targetTeam) {
+        transferArrayItem(
+          event.previousContainer.data,
+          event.container.data,
+          event.previousIndex,
+          event.currentIndex
+        );
+        this.onTeamUpdate({
+          type: TeamUpdateType.Add,
+          category: this.findCategoryByTeamId(targetTeam.id)!,
+          team: targetTeam,
+          unit: unit
+        });
+      }
+    }
+    this.updateState();
+  }
+
+  private findTeamById(teamId: string): Team | undefined {
+    return this.state.categories.flatMap(category => category.teams).find(team => team.id === teamId);
+  }
+
+  private findCategoryByTeamId(teamId: string): Category | undefined {
+    return this.state.categories.find(category => category.teams.some(team => team.id === teamId));
   }
 }
