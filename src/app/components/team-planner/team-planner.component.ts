@@ -29,7 +29,7 @@ export interface Tab
 })
 export class TeamPlannerComponent implements OnInit {
 
-  tabs: Tab[] = [];
+  allCategories: Category[] = [];
 
   constructor(
     private authService: AuthService,
@@ -43,9 +43,8 @@ export class TeamPlannerComponent implements OnInit {
 
     // further support for this later
     // for now, one tab setup with default category and default team
-    const defaultTab = this.teamService.allCategories;
+    this.allCategories = this.teamService.allCategories;
     this.teamService.createNewCategory();
-    this.tabs.push({categories: defaultTab});
   }
 
   toggleUnique() {

@@ -1,9 +1,9 @@
 <div cdkDropListGroup class="team-planner">
 
   <div class="team-planner-left">
-    <div *ngIf="this.tabs.length !== 0">
+    <div *ngIf="this.allCategories.length !== 0">
       <app-category-list
-        [categories]="tabs[0].categories">
+        [categories]="allCategories">
       </app-category-list>
       <button mat-raised-button color="primary" (click)="toggleUnique()">Toggle Unique</button>
     </div>
