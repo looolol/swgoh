@@ -1,0 +1,6 @@
+<div class="team-list">
+    <div *ngFor="let team of category.teams">
+        <h3>{{ team.name }}</h3>
+        <app-team [team]="team"></app-team>
+    </div>
+</div>

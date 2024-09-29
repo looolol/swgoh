@@ -1,4 +1,4 @@
-<div class="character-container">
+<div class="character-container" (click)="onClick($event)">
   <div class="character-frame">
     <img [src]="characterImage$ | async" [alt]="unit.characterDefinition.name" class="character-image">
     <img [src]="gearFrameUrl" alt="Gear Frame" class="gear-frame">

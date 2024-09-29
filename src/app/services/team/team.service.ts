@@ -1,83 +1,141 @@
 import { Injectable } from '@angular/core';
-import { Category, Team, Unit } from '../../models/team.model';
+import {Category, Team, TeamPlannerState, Unit} from '../../models/team.model';
 import { generateUniqueId } from '../../helper/common';
+import {UnitService} from "../unit/unit.service";
+import {BehaviorSubject, Subject} from "rxjs";
 
 @Injectable({
   providedIn: 'root'
 })
 export class TeamService {
 
-  constructor() { }
+  store: TeamPlannerState = {
+    units: [],
+    categories: [],
+    isUnique: true
+  };
 
-  private numCategories: number = 0;
+  private triggerChangeDetectionSubject = new Subject<void>();
+
+  triggerChangeDetection$ = this.triggerChangeDetectionSubject.asObservable();
+
+  constructor(
+    private unitService: UnitService
+  ) { }
+
+  async loadStores(allyCode: number) {
+    await this.unitService.loadStores(allyCode);
+  }
+
 
   //-------------------------------------------------------------------------------------------------
   // Category methods
   //-------------------------------------------------------------------------------------------------
 
-  createNewCategory(): Category {
-    this.numCategories++;
+  createNewCategory(): void {
 
-    return {
+    const category: Category = {
       id: generateUniqueId(),
-      name: `Category ${this.numCategories}`,
+      name: `Category ${this.store.categories.length + 1}`,
       teams: []
     };
+
+    this.store.categories.push(category);
   }
 
-  removeCategory(category: Category, categories: Category[]): void {
-    const index = categories.indexOf(category);
-    categories.splice(index, 1);
-    this.numCategories--;
+  removeCategory(toRemove: Category): void {
+    this.store.categories = this.store.categories.filter(category =>
+      category !== toRemove
+    );
+  }
+
+  get allCategories() {
+    return this.store.categories;
+  }
+
+  get allTeams(): Team[] {
+    return this.store.categories.flatMap(category => category.teams);
   }
 
   //-------------------------------------------------------------------------------------------------
   // Team methods
   //-------------------------------------------------------------------------------------------------
 
-  addTeam(team: Team, category: Category): void {
-    category.teams.push(team);
-  }
-
-  createNewTeam(): Team {
-    return {
+  createNewTeam(category: Category): void {
+    const team: Team = {
       id: generateUniqueId(),
       name: `New Team`,
       units: []
     };
+
+    category.teams.push(team);
   }
 
-  removeTeam(team: Team, category: Category): void {
-    const index = category.teams.indexOf(team);
-    category.teams.splice(index, 1);
+  removeTeam(toRemove: Team): void {
+    this.store.categories.forEach(category => {
+      category.teams = category.teams.filter(team =>
+        team !== toRemove
+      );
+    })
   }
 
   renameTeam(newName: string, team: Team): void {
     team.name = newName;
   }
 
-  moveUnitInTeam(unit: Unit, team: Team, newIndex: number): void {
-    const index = team.units.indexOf(unit);
-    if (index !== -1) {
-      team.units.splice(index, 1);
-      team.units.splice(newIndex, 0, unit);
-    }
+  getTeamById(id: string): Team | undefined {
+    return this.allTeams.find(team => team.id === id);
   }
 
-  //-------------------------------------------------------------------------------------------------
-  // Unit methods
-  //-------------------------------------------------------------------------------------------------
 
-  addUnitToTeam(unit: Unit, team: Team): void {
-    if (team.units.length < 5 && !team.units.some(u => u.id === unit.id)) {
-      team.units.push(unit);
-    }
+  //////
+  // Event Emitter
+  //////
+
+  notifyChangeDetection() {
+    this.triggerChangeDetectionSubject.next();
   }
 
-  removeUnitFromTeam(unit: Unit, team: Team): void {
-    const index = team.units.indexOf(unit);
-    if (index !== -1) {
-      team.units.splice(index, 1);
-    }
-  }  
+  // move unit from team to unit-selection
+  moveToUnitSelection(unit: Unit, team: Team) {
+    console.log("TeamService moveToUnitSelection");
+    console.log("unit", unit);
+    console.log("team", team);
+
+    team.units = team.units.filter(teamUnit => teamUnit !== unit);
+    unit.assigned = false;
+
+    this.notifyChangeDetection();
+  }
+
+  moveToNewTeam(unit: Unit, team: Team) {
+    console.log("TeamService moveToNewTeam");
+    console.log("unit", unit);
+    console.log("team", team);
+
+    unit.assigned = true;
+    team.units.push(unit);
+
+    this.notifyChangeDetection();
+  }
+
+  reorderInTeam() {
+    console.log("TeamService reorderInTeam");
+
+    this.notifyChangeDetection();
+  }
+
+  ///////
+  // Other
+  ///////
+
+
+  get unique() {
+    return this.store.isUnique;
+  }
+
+  toggleUnique() {
+    this.store.isUnique = !this.store.isUnique;
+  }
+
 }

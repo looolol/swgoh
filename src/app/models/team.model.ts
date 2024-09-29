@@ -2,8 +2,8 @@ import { Character } from "./game-data/character.model";
 import { UserUnitData } from "./user-data/unit-user-data.model";
 
 export interface TeamPlannerState {
-  categories: Category[];
   units: Unit[];
+  categories: Category[];
   isUnique: boolean;
 }
 

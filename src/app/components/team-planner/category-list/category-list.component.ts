@@ -1,33 +1,34 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { Category, Team, Unit } from '../../../models/team.model';
-import { TeamListComponent } from '../team-list/team-list.component';
+import { Component, Input } from '@angular/core';
+import { Category } from '../../../models/team.model';
+import { CategoryComponent } from './category/category.component';
 import { CommonModule } from '@angular/common';
-import { TeamUpdateEvent } from '../../../models/team-update-event.model';
 import { MatButtonModule } from '@angular/material/button';
+import { TeamService } from "../../../services/team/team.service";
 
 @Component({
   selector: 'app-category-list',
   standalone: true,
   imports: [
     CommonModule,
-    TeamListComponent,
+    CategoryComponent,
     MatButtonModule
   ],
   templateUrl: './category-list.component.html',
   styleUrl: './category-list.component.scss'
 })
-export class CategoryListComponent {
+export class CategoryListComponent { //possible name tab component to support multiple tabs of categories
   @Input() categories: Category[] = [];
-  @Input() isUnique: boolean = true;
-  @Output() addCategory = new EventEmitter<void>();
-  @Output() addTeam = new EventEmitter<string>();
-  @Output() teamUpdate = new EventEmitter<TeamUpdateEvent>();
 
-  onAddCategory(): void {
-    this.addCategory.emit();
+  constructor(
+    private teamService: TeamService
+  ) {}
+
+  addCategory() {
+    this.teamService.createNewCategory();
   }
 
-  onTeamUpdate(event: TeamUpdateEvent): void {
-    this.teamUpdate.emit(event);
+  addTeam(category: Category) {
+    this.teamService.createNewTeam(category);
   }
+
 }

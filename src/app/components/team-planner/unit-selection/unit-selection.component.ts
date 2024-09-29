@@ -1,11 +1,12 @@
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { UnitService } from '../../../services/unit/unit.service';
-import { TeamPlannerState, Unit } from '../../../models/team.model';
+import { Unit } from '../../../models/team.model';
 import { CdkDragDrop, DragDropModule, transferArrayItem } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CharacterComponent } from '../../shared/character/character.component';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import {TeamService} from "../../../services/team/team.service";
 
 @Component({
   selector: 'app-unit-selection',
@@ -20,72 +21,60 @@ import { ScrollingModule } from '@angular/cdk/scrolling';
   templateUrl: './unit-selection.component.html',
   styleUrl: './unit-selection.component.scss'
 })
-export class UnitSelectionComponent implements OnInit, OnChanges {
+export class UnitSelectionComponent implements OnInit {
 
-  @Input() state!: TeamPlannerState;
-  @Input() isUnique: boolean = true;
-  @Output() unitSelected = new EventEmitter<Unit>();
   @Output() drop = new EventEmitter<CdkDragDrop<Unit[]>>();
 
   searchTerm = '';
   filteredUnits: Unit[] = [];
 
   constructor(
-    private unitService: UnitService
+    private unitService: UnitService,
+    private teamService: TeamService
   ) {}
 
   ngOnInit() {
-    this.updatedFilteredUnits();
-  }
+    this.unitService.unitsReadySubject.subscribe(isReady => {
+      if (isReady) {
+        // add all unassigned users to the list of selectable units
 
-  ngOnChanges(changes: SimpleChanges) {
-    if (changes['state'] || changes['filteredUnits']) {
-      this.updatedFilteredUnits();
-    }
-  }
+        // initialize filtered units with all selectable units
+        this.filteredUnits = this.unitService.unassignedUnits;
+      }
+    });
 
-  private updatedFilteredUnits() {
-    this.filteredUnits = this.sortUnitsByPower(this.state.units.filter(unit => !unit.assigned));
-  }  
-  
-  private sortUnitsByPower(units: Unit[]): Unit[] {
-    return units.sort((a, b) => b.userUnitData.data.power - a.userUnitData.data.power);
+    // ensure immutability to rerender the cdk-viewport
+    this.teamService.triggerChangeDetection$.subscribe(() => {
+      console.log("triggering change detection");
+      this.filteredUnits = [...this.unitService.unassignedUnits];
+    });
   }
 
   onSearch() {
-    if (this.searchTerm.trim() === '') {
-      this.updatedFilteredUnits();
-    } else {
-      this.filteredUnits = this.sortUnitsByPower(
-        this.unitService.filterUnits(this.searchTerm, this.state.units.filter(unit => !unit.assigned))
-      );
-    }
+    this.filteredUnits = this.unitService.filterUnits(this.searchTerm);
   }
+
 
   // when dragged from team -> unit-selection
   // emit event to team-planner which handles unit state
   onDrop(event: CdkDragDrop<Unit[]>) {
     if (event.previousContainer !== event.container) {
       const unit = event.item.data as Unit;
-      console.log("Unit Selection Drop\n", unit.userUnitData.data.name, event);
-
-      // Update the unit's assigneed status
-      unit.assigned = false;
-
-      transferArrayItem(
-        event.previousContainer.data,
-        event.container.data,
-        event.previousIndex,
-        event.currentIndex,
-      );
-
-      this.updatedFilteredUnits();
-
-      this.drop.emit(event);
+      const team = this.teamService.getTeamById(event.previousContainer.id);
+      if (team) {
+        this.teamService.moveToUnitSelection(unit, team);
+      } else {
+        console.warn(`Couldn't find team ${event.previousContainer.id}`);
+      }
     }
   }
 
   trackByUnitId(index: number, unit: Unit): string {
     return unit.id;
+  }
+
+  onDragEnded(event: any) {
+    console.log("on Drag Ended");
+    this.filteredUnits = [...this.filteredUnits];
   }
 }

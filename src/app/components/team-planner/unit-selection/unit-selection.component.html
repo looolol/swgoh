@@ -1,9 +1,20 @@
 <input [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" placeholder="Search units...">
-<cdk-virtual-scroll-viewport itemSize="80" class="unit-list" 
-    minBufferPx="800" maxBufferPx="1000" 
-    cdkDropList [cdkDropListData]="filteredUnits" 
-    (cdkDropListDropped)="onDrop($event)">
-  <div *cdkVirtualFor="let unit of filteredUnits; trackBy: trackByUnitId" cdkDrag [cdkDragData]="unit">
+
+<cdk-virtual-scroll-viewport itemSize="80" class="unit-list"
+    minBufferPx="800" maxBufferPx="1000"
+    cdkDropList
+    id="unit-selection"
+    [cdkDropListData]="filteredUnits"
+    (cdkDropListDropped)="onDrop($event)"
+    (cdkDragEnded)="onDragEnded($event)"
+    cdkDropListSortingDisabled
+>
+
+  <div *cdkVirtualFor="let unit of filteredUnits; trackBy: trackByUnitId"
+    cdkDrag
+    [cdkDragData]="unit">
+
     <app-character [unit]="unit"></app-character>
+
   </div>
 </cdk-virtual-scroll-viewport>

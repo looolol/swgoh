@@ -23,7 +23,7 @@ export class CharacterComponent implements OnInit, OnChanges {
     private imageLoadingService: ImageLoadingService,
     private cdr: ChangeDetectorRef
   ) {}
-  
+
   ngOnInit() {
     this.initializeComponent();
   }
@@ -70,5 +70,9 @@ export class CharacterComponent implements OnInit, OnChanges {
       ...Array(fullStars).fill({src: '/images/star.png', class: 'full-star'}),
       ...Array(emptyStars).fill({src: '/images/star-empty.png', class: 'empty-star'})
     ];
+  }
+
+  onClick(event: MouseEvent) {
+    console.log(this.unit.userUnitData.data.name, this.unit);
   }
 }
