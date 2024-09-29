@@ -1,6 +1,12 @@
 <div class="category-list">
     <div *ngFor="let category of this.categories" class="category">
-        <h2>{{ category.name }}</h2>
+        <div class="category-banner">
+            <div class="category-header"><h2>{{ category.name }}</h2></div>
+            <div class="category-buttons">
+                <button mat-icon-button (click)="openEditDialog(category)"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button (click)="removeCategory(category)"><mat-icon>delete</mat-icon></button>
+            </div>
+        </div>
         <app-category [category]="category"></app-category>
         <button mat-raised-button color="primary" (click)="addTeam(category)">Add Team</button>
     </div>

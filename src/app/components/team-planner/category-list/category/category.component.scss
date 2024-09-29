@@ -1,31 +1,20 @@
-.team-list {
+.category-container {
   display: flex;
   flex-wrap: wrap;
   gap: 15px;
-  background-color: #00ff00;
 }
 
-.team {
+.team-container {
   border: 1px solid #ddd;
   border-radius: 5px;
   padding: 10px;
-  background-color: #ffffff;
   transition: background-color 0.3s ease;
   min-width: 200px;
   min-height: 100px;
-
-  &:hover {
-    background-color: #f0f0f0;
-  }
+  width: 100%;
 }
 
-h3 {
-  margin-bottom: 10px;
-}
-
-.team-header {
+.team-banner {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-}
+} 

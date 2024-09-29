@@ -3,6 +3,7 @@ import {Category, Team, TeamPlannerState, Unit} from '../../models/team.model';
 import { generateUniqueId } from '../../helper/common';
 import {UnitService} from "../unit/unit.service";
 import {BehaviorSubject, Subject} from "rxjs";
+import { moveItemInArray } from '@angular/cdk/drag-drop';
 
 @Injectable({
   providedIn: 'root'
@@ -40,6 +41,8 @@ export class TeamService {
       teams: []
     };
 
+    this.createNewTeam(category);
+
     this.store.categories.push(category);
   }
 
@@ -47,6 +50,7 @@ export class TeamService {
     this.store.categories = this.store.categories.filter(category =>
       category !== toRemove
     );
+    console.log("store.categories", this.store.categories);
   }
 
   get allCategories() {
@@ -56,6 +60,7 @@ export class TeamService {
   get allTeams(): Team[] {
     return this.store.categories.flatMap(category => category.teams);
   }
+
 
   //-------------------------------------------------------------------------------------------------
   // Team methods
@@ -72,6 +77,8 @@ export class TeamService {
   }
 
   removeTeam(toRemove: Team): void {
+    toRemove.units.forEach(unit => this.moveToUnitSelection(unit, toRemove));
+
     this.store.categories.forEach(category => {
       category.teams = category.teams.filter(team =>
         team !== toRemove
@@ -88,9 +95,18 @@ export class TeamService {
   }
 
 
-  //////
-  // Event Emitter
-  //////
+  //-------------------------------------------------------------------------------------------------
+  // Unit methods
+  //-------------------------------------------------------------------------------------------------
+
+  removeUnit(unit: Unit, team: Team) {
+    this.moveToUnitSelection(unit, team);
+  }
+
+
+  //-------------------------------------------------------------------------------------------------
+  // Change Detection
+  //-------------------------------------------------------------------------------------------------
 
   notifyChangeDetection() {
     this.triggerChangeDetectionSubject.next();
@@ -98,36 +114,40 @@ export class TeamService {
 
   // move unit from team to unit-selection
   moveToUnitSelection(unit: Unit, team: Team) {
-    console.log("TeamService moveToUnitSelection");
-    console.log("unit", unit);
-    console.log("team", team);
-
     team.units = team.units.filter(teamUnit => teamUnit !== unit);
     unit.assigned = false;
 
     this.notifyChangeDetection();
   }
 
-  moveToNewTeam(unit: Unit, team: Team) {
-    console.log("TeamService moveToNewTeam");
-    console.log("unit", unit);
-    console.log("team", team);
+  moveToNewTeam(unit: Unit, newTeam: Team, oldTeam: Team | undefined = undefined) {
+    if (newTeam.units.length >= 5) return;
 
     unit.assigned = true;
-    team.units.push(unit);
+    
+    newTeam.units.push(unit);
+    if (oldTeam) {
+      oldTeam.units = oldTeam.units.filter(oldUnit => oldUnit != unit);
+    }
 
     this.notifyChangeDetection();
   }
 
-  reorderInTeam() {
-    console.log("TeamService reorderInTeam");
+  reorderInTeam(currentIndex: number, previousIndex: number, team: Team) {
+    console.log("reorder in team");
+    console.log("current index", currentIndex);
+    console.log("previous index", previousIndex);
+    console.log("team", team);
+
+    moveItemInArray(team.units, previousIndex, currentIndex);
+
 
     this.notifyChangeDetection();
   }
 
-  ///////
+  //-------------------------------------------------------------------------------------------------
   // Other
-  ///////
+  //-------------------------------------------------------------------------------------------------
 
 
   get unique() {

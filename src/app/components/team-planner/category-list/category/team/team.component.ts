@@ -35,23 +35,24 @@ export class TeamComponent {
     const unit = event.item.data as Unit;
 
     if (event.previousContainer !== event.container) {
-      if (event.container.id === 'unit-selection') {
-        console.log("moved from team to unit-selection");
-        // moved to unit selection
-        this.teamService.moveToUnitSelection(unit, this.team);
-      } else {
-        // moved to new team
-        console.log("moved from team to new team", event.container.id);
+      if (event.previousContainer.id === 'unit-selection') {
+        console.log("drop from unit-selection");
         this.teamService.moveToNewTeam(unit, this.team);
+      } else {
+        console.log("drop from other team");
+        // moved to new team
+        const oldTeam = this.teamService.getTeamById(event.previousContainer.id);
+        this.teamService.moveToNewTeam(unit, this.team, oldTeam);
       }
     } else {
       // reordered in team
-      console.log("moved to same team: reorder unit")
-      this.teamService.reorderInTeam();
+      console.log("moved to same team: reorder unit", event)
+      this.teamService.reorderInTeam(event.currentIndex, event.previousIndex, this.team);
     }
   }
 
   removeUnit(unit: Unit) {
     console.log("Remove unit", unit);
+    this.teamService.removeUnit(unit, this.team);
   }
 }
