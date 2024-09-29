@@ -47,6 +47,7 @@ export class UnitSelectionComponent implements OnInit {
     this.teamService.triggerChangeDetection$.subscribe(() => {
       console.log("triggering change detection");
       this.filteredUnits = [...this.unitService.unassignedUnits];
+      this.onSearch();
     });
   }
 
