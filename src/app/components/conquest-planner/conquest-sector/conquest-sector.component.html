@@ -1,0 +1,135 @@
+<div class="sector-container">
+
+  <h2> {{sector.name }} </h2>
+
+  <!-- Sector Progress -->
+  <mat-form-field apparance="fill" *ngIf="sector.name !== 'Global'">
+    <input matInput type="number" [(ngModel)]="sectorProgress"
+           (ngModelChange)="onSectorProgressChange($event)"
+           [min]="0" [max]="sector.total"
+    />
+  </mat-form-field>
+
+  <ng-container *ngIf="getSectorFeatProgress() + sector.keycardProgress < sectorProgress">
+    <p>Feat Status is Incorrect</p>
+    <p>{{getSectorFeatProgress()}}</p>
+    <p>{{sector.keycardProgress}}</p>
+    <p>{{sectorProgress}}</p>
+  </ng-container>
+
+
+  <!-- Sector Feats -->
+
+  <table mat-table [dataSource]="getSectorFeats()">
+
+    <!-- Complete Column -->
+    <ng-container matColumnDef="complete">
+      <th mat-header-cell *matHeaderCellDef> Complete </th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button (click)="toggleCompleted(element)">
+          <mat-icon *ngIf="element.completed" style="color: red">close</mat-icon>
+          <mat-icon *ngIf="!element.completed">check</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <!-- Description Column -->
+    <ng-container matColumnDef="desc">
+      <th mat-header-cell *matHeaderCellDef> Sector Feats </th>
+      <td mat-cell *matCellDef="let element">
+        <span> {{ element.description }} </span>
+        <mat-progress-bar mode="determinate" *ngIf="element.completed" [value]="100"></mat-progress-bar>
+        <mat-progress-bar mode="determinate" *ngIf="!element.completed"
+                          [value]="(element.progress / element.required) * 100">
+        </mat-progress-bar>
+      </td>
+    </ng-container>
+
+    <!-- Progress Column -->
+    <ng-container matColumnDef="progress">
+      <th mat-header-cell *matHeaderCellDef> Progress </th>
+      <td mat-cell *matCellDef="let element">
+        <mat-form-field apparance="fill">
+          <input matInput type="number" [(ngModel)]="element.progress"
+                 (ngModelChange)="onFeatProgressChange(element, $event)"
+                 [min]="0" [max]="element.required"
+                 [disabled]="element.completed"
+          />
+        </mat-form-field>
+      </td>
+    </ng-container>
+
+    <!-- Total Column -->
+    <ng-container matColumnDef="total">
+      <th mat-header-cell *matHeaderCellDef> Total </th>
+      <td mat-cell *matCellDef="let element"> {{ element.required }}</td>
+    </ng-container>
+
+    <!-- Keycards Column -->
+    <ng-container matColumnDef="keycards">
+      <th mat-header-cell *matHeaderCellDef> Keycards </th>
+      <td mat-cell *matCellDef="let element"> {{ element.keycards }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="featColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: featColumns;"></tr>
+  </table>
+
+
+  <!-- MiniBoss -->
+
+  <table mat-table *ngIf="getMiniBossNodeFeats()" [dataSource]="getMiniBossNodeFeats()">
+
+    <ng-container matColumnDef="complete">
+      <th mat-header-cell *matHeaderCellDef> Complete </th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button (click)="toggleCompleted(element)">
+          <mat-icon *ngIf="element.completed" style="color: red">close</mat-icon>
+          <mat-icon *ngIf="!element.completed">check</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="desc">
+      <th mat-header-cell *matHeaderCellDef> Mini Boss Node Feats </th>
+      <td mat-cell *matCellDef="let element"> {{ element.description }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="keycards">
+      <th mat-header-cell *matHeaderCellDef> Keycards </th>
+      <td mat-cell *matCellDef="let element"> {{ element.keycards }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="bossNodeColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: bossNodeColumns;"></tr>
+  </table>
+
+  <!-- Boss Node -->
+
+  <table mat-table *ngIf="getBossNodeFeats()" [dataSource]="getBossNodeFeats()">
+
+    <ng-container matColumnDef="complete">
+      <th mat-header-cell *matHeaderCellDef> Complete </th>
+      <td mat-cell *matCellDef="let element">
+        <button mat-icon-button (click)="toggleCompleted(element)">
+          <mat-icon *ngIf="element.completed" style="color: red">close</mat-icon>
+          <mat-icon *ngIf="!element.completed">check</mat-icon>
+        </button>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="desc">
+      <th mat-header-cell *matHeaderCellDef> Boss Node Feats </th>
+      <td mat-cell *matCellDef="let element"> {{ element.description }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="keycards">
+      <th mat-header-cell *matHeaderCellDef> Keycards </th>
+      <td mat-cell *matCellDef="let element"> {{ element.keycards }}</td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="bossNodeColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: bossNodeColumns;"></tr>
+  </table>
+
+</div>

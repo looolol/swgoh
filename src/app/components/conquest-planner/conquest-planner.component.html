@@ -1,1 +1,33 @@
-<p>conquest-planner works!</p>
+<div class="conquest-planner-container">
+
+  <h1> Conquest Planner </h1>
+
+  <!-- Keycards -->
+  <mat-form-field apparance="fill">
+    <input matInput type="number" [(ngModel)]="conquestStore.keycardProgress"
+           (ngModelChange)="onProgressChange($event)"
+           [min]="0" [max]="conquestStore.total"/>
+  </mat-form-field>
+
+  <!-- Actions -->
+  <div class="conquest-planner-buttons">
+    <button mat-raised-button color="primary" (click)="toggleCompletedFeats()">
+      <span *ngIf="showCompletedFeats">Hide Completed Feats</span>
+      <span *ngIf="!showCompletedFeats">Show Completed Feats</span>
+    </button>
+    <button mat-raised-button color="primary" (click)="resetCompletedFeats()">Reset Feats</button>
+  </div>
+
+  <!-- Sectors -->
+  <div class="sector-container">
+    <ng-container *ngFor="let sector of this.getConquestSectors()">
+      <app-conquest-sector
+        [sector]="sector"
+        [showCompletedFeats]="showCompletedFeats"
+        (saveProgress)="onSaveProgress()">
+      </app-conquest-sector>
+    </ng-container>
+  </div>
+
+
+</div>
