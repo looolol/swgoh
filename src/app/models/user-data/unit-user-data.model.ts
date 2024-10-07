@@ -1,4 +1,4 @@
-export type Unit = {
+export type UserUnitData = {
     data: {
         base_id: string;
         name: string;

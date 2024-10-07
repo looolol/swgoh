@@ -3,7 +3,7 @@ import { StoreService } from '../store/store.service';
 import { SwgohApiService } from '../swgoh-api/swgoh-api.service';
 import { User } from '../../models/user-data/user.model';
 import { StorageService } from '../storage/storage.service';
-import { Unit } from '../../models/user-data/unit.model';
+import { UserUnitData } from '../../models/user-data/unit-user-data.model';
 import { Mod } from '../../models/user-data/mod.model';
 import { Datacron } from '../../models/user-data/datacron.model';
 import { UserDataStore } from '../../models/store.model';
@@ -24,6 +24,7 @@ export class UserDataService extends StoreService {
     return {
       user: await this.getUser(allyCode),
       units: await this.getUnits(allyCode),
+      ships: await this.getShips(allyCode),
       mods: await this.getMods(allyCode),
       datacrons: await this.getDatacrons(allyCode)
     };
@@ -33,8 +34,16 @@ export class UserDataService extends StoreService {
     return this.fetchAndCacheData(`${allyCode}_user`, () => this.swgohApiService.getPlayerProfile(allyCode));
   }
 
-  async getUnits(allyCode: number): Promise<Unit[]> {
-    return this.fetchAndCacheData(`${allyCode}_units`, () => this.swgohApiService.getUnits(allyCode));
+  async getUnits(allyCode: number): Promise<UserUnitData[]> {
+    const units = await this.fetchAndCacheData(`${allyCode}_units`, () => this.swgohApiService.getUnits(allyCode));
+
+    return units.filter(unit => unit.data.combat_type === 1);
+  }
+
+  async getShips(allyCode: number): Promise<UserUnitData[]> {
+    const units = await this.fetchAndCacheData(`${allyCode}_units`, () => this.swgohApiService.getUnits(allyCode));
+
+    return units.filter(unit => unit.data.combat_type === 2);
   }
 
   async getMods(allyCode: number): Promise<Mod[]> {

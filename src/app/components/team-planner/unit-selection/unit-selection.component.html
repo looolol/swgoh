@@ -1,0 +1,20 @@
+<input [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" placeholder="Search units...">
+
+<cdk-virtual-scroll-viewport itemSize="150" class="unit-list"
+    minBufferPx="800" maxBufferPx="1000"
+    cdkDropList
+    id="unit-selection"
+    [cdkDropListData]="rowItems"
+    (cdkDropListDropped)="onDrop($event)"
+    cdkDropListSortingDisabled
+>
+
+  <div *cdkVirtualFor="let row of rowItems;">
+    <div class="unit-row">
+      <div *ngFor="let unit of row" cdkDrag [cdkDragData]="unit">
+        <app-character [unit]="unit"></app-character>
+      </div>
+    </div>
+  </div>
+
+</cdk-virtual-scroll-viewport>

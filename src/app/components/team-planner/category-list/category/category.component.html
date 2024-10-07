@@ -1,0 +1,12 @@
+<div class="category-container">
+    <div *ngFor="let team of category.teams" class="team-container">
+        <div class="team-banner">
+            <div class="team-header"><h3>{{ team.name }}</h3></div>
+            <div class="team-buttons">
+                <button mat-icon-button (click)="openEditDialog(team)"><mat-icon>edit</mat-icon></button>
+                <button mat-icon-button (click)="removeTeam(team)"><mat-icon>delete</mat-icon></button>
+            </div>
+        </div>
+        <app-team [team]="team"></app-team>
+    </div>
+</div>

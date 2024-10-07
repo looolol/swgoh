@@ -1,0 +1,24 @@
+<div cdkDropList
+     [id]="team.id"
+     [cdkDropListData]="this.team.units"
+     (cdkDropListDropped)="onDrop($event)"
+     class="unit-list">
+
+    <div *ngFor="let unit of this.team.units" class="unit-item"
+        cdkDrag
+        [cdkDragData]="unit">
+
+        <div class="unit-content">
+            <app-character [unit]="unit"></app-character>
+            <button mat-icon-button (click)="removeUnit(unit)" class="remove-button">
+                <mat-icon>close</mat-icon>
+            </button>
+        </div>
+
+        <div class="drag-placeholder" *cdkDragPlaceholder></div>
+    </div>
+
+    <div *ngIf="this.team.units.length === 0" class="empty-list">
+        Drag and drop units here
+    </div>
+</div>

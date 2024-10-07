@@ -1,0 +1,20 @@
+.category-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.team-container {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  transition: background-color 0.3s ease;
+  min-width: 200px;
+  min-height: 100px;
+  width: 100%;
+}
+
+.team-banner {
+  display: flex;
+  justify-content: space-between;
+} 
